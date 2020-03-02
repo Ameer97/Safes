@@ -81,7 +81,7 @@ namespace Safes.WebApi.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ClientResponse<Box>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> CreateOwner(OwnerCreateDto Owner)
+        public async Task<IActionResult> CreateOwner(PersonCreateDto Owner)
         {
             var serviceResponse = await _ownerService.CreateOwner(Owner);
             if (serviceResponse.Error != null)
@@ -90,7 +90,26 @@ namespace Safes.WebApi.Controllers
         }
         #endregion
         #region Meditor
-
+        [HttpGet]
+        [ProducesResponseType(typeof(ClientResponse<List<Meditor>>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> GetMeditors(int start, int end)
+        {
+            var serviceResponse = await _meditorService.GetMeditors(start, end);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<List<Meditor>>(serviceResponse.Value));
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ClientResponse<Meditor>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> CreateMeditor(PersonCreateDto Meditor)
+        {
+            var serviceResponse = await _meditorService.CreateOwner(Meditor);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<Meditor>(serviceResponse.Value));
+        }
         #endregion
     }
 }

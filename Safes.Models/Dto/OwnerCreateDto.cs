@@ -1,6 +1,6 @@
 ﻿namespace Safes.Models.Dto
 {
-    public class OwnerCreateDto
+    public class PersonCreateDto
     {
         public string FirstName { get; set; }
         public string SecondName { get; set; }

@@ -45,16 +45,11 @@ namespace Safes.ServiceLayer
                     Error = new ResponseError("No Owners Found")
                 };
         }
-        public async Task<ServiceResponse<Owner>> CreateOwner(OwnerCreateDto form)
+        public async Task<ServiceResponse<Owner>> CreateOwner(PersonCreateDto form)
         {
             var Owner = _mapper.Map<Owner>(form);
             _repositoryWrapper.OwnerRepository.Insert(Owner);
             return new ServiceResponse<Owner>(Owner);
-            //? 
-            //: new ServiceResponse<Box>(null)
-            //{
-            //    Error = new ResponseError("No Boxes Found")
-            //};
         }
     }
 }

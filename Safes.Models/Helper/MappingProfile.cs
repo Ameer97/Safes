@@ -14,8 +14,11 @@ namespace Safes.Models.Helper
             CreateMap<Box, BoxCreateDto>();
             CreateMap<BoxCreateDto, Box>();
 
-            CreateMap<OwnerCreateDto, Owner>();
-            CreateMap<Owner, OwnerCreateDto>();
+            CreateMap<PersonCreateDto, Owner>();
+            CreateMap<Owner, PersonCreateDto>();
+
+            CreateMap<PersonCreateDto, Meditor>();
+            CreateMap<Meditor, PersonCreateDto>();
 
         }
     }
