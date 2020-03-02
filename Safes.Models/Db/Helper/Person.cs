@@ -14,7 +14,7 @@ namespace Safes.Models.Db.Helper
         public virtual string FirstName { get; set; }
         public virtual string SecondName { get; set; }
         public virtual string LastName { get; set; }
-        public virtual int Age { get; set; }
+        public virtual int BirthYear { get; set; }
         public virtual bool IsMale { get; set; }
         public virtual string Phone { get; set; }
         public virtual string Address { get; set; }

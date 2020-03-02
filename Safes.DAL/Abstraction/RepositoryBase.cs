@@ -45,20 +45,24 @@ namespace Safes.DAL.Abstraction
         public void Insert(TModel entity)
         {
             RepositoryContext.Set<TModel>().Add(entity);
+            Save();
         }
 
         public void InsertRange(List<TModel> entity)
         {
             RepositoryContext.Set<TModel>().AddRange(entity);
+            Save();
         }
 
         public void Update(TModel entity)
         {
             RepositoryContext.Set<TModel>().Update(entity);
+            Save();
         }
         public void UpdateRange(IEnumerable<TModel> entities)
         {
             RepositoryContext.Set<TModel>().UpdateRange(entities);
+            Save();
         }
 
         public void Save()

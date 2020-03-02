@@ -40,14 +40,14 @@ namespace Safes.WebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(ClientResponse<List<Box>>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> GetNearestPoints(int start, int end)
+        public async Task<IActionResult> GetBoxes(int start, int end)
         {
             var serviceResponse = await _boxService.GetBoxes(start, end);
             if (serviceResponse.Error != null)
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
             return Ok(new ClientResponse<List<Box>>(serviceResponse.Value));
         }
-        [HttpGet]
+        [HttpPost]
         [ProducesResponseType(typeof(ClientResponse<Box>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
         public async Task<IActionResult> CreateBox(BoxCreateDto box)
@@ -68,7 +68,26 @@ namespace Safes.WebApi.Controllers
 
         #endregion
         #region Owner
-
+        [HttpGet]
+        [ProducesResponseType(typeof(ClientResponse<List<Box>>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> GetOwners(int start, int end)
+        {
+            var serviceResponse = await _ownerService.GetOwners(start, end);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<List<Owner>>(serviceResponse.Value));
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ClientResponse<Box>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> CreateOwner(OwnerCreateDto Owner)
+        {
+            var serviceResponse = await _ownerService.CreateOwner(Owner);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<Owner>(serviceResponse.Value));
+        }
         #endregion
         #region Meditor
 
