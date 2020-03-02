@@ -7,6 +7,8 @@
   <ItemGroup>
     <Compile Remove="Migrations\20200228184057_initial1.cs" />
     <Compile Remove="Migrations\20200228184057_initial1.Designer.cs" />
+    <Compile Remove="Migrations\20200302172149_AddingEventToBoxTable.cs" />
+    <Compile Remove="Migrations\20200302172149_AddingEventToBoxTable.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
