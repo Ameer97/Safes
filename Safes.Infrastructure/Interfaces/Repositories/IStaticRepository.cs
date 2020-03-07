@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Safes.Infrastructure.Interfaces.Repositories
 {
-    public interface IStaticRepository : IRepositoryBase<StaticBoxes>
+    public interface IStaticRepository : IRepositoryBase<StaticBox>
     {
     }
 }

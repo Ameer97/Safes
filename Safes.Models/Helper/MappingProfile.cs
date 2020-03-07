@@ -11,14 +11,16 @@ namespace Safes.Models.Helper
     {
         public MappingProfile()
         {
-            CreateMap<Box, BoxCreateDto>();
+            //CreateMap<Box, BoxCreateDto>();
             CreateMap<BoxCreateDto, Box>();
 
             CreateMap<PersonCreateDto, Owner>();
-            CreateMap<Owner, PersonCreateDto>();
+            //CreateMap<Owner, PersonCreateDto>();
 
             CreateMap<PersonCreateDto, Meditor>();
-            CreateMap<Meditor, PersonCreateDto>();
+            //CreateMap<Meditor, PersonCreateDto>();
+
+            CreateMap<StaticBoxCreateDto, StaticBoxReuse>();
 
         }
     }

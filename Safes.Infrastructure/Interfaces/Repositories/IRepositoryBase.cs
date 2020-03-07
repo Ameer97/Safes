@@ -9,6 +9,7 @@ namespace Safes.Infrastructure.Interfaces.Repositories
     public interface IRepositoryBase<T> : IDisposable
     {
         IEnumerable<T> FindAll();
+        IEnumerable<T> FindAllTakeSkip(int start, int end);
         IEnumerable<T> FindByCondition(Expression<Func<T, bool>> expression);
         Task<T> FindItemByCondition(Expression<Func<T, bool>> expression);
         void Insert(T entity);

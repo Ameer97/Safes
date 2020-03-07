@@ -6,6 +6,7 @@ namespace Safes.Infrastructure.Interfaces.Repositories
     {
         IBoxRepository BoxRepository { get; }
         IStaticRepository StaticRepository { get; }
+        IStaticBoxReuseRepository StaticBoxReuseRepository { get; }
         IUserRepository UserRepository { get; }
         IOwnerRepository OwnerRepository { get; }
         IMeditorRepository MeditorRepository { get; }

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Safes.DAL.Repositories
 {
-    public class StaticRepository : RepositoryBase<StaticBoxes,SafesDbContext>, IStaticRepository
+    public class StaticRepository : RepositoryBase<StaticBox,SafesDbContext>, IStaticRepository
     {
         private SafesDbContext _context;
         public StaticRepository(SafesDbContext RepositoryContext)

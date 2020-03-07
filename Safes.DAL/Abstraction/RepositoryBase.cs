@@ -30,6 +30,12 @@ namespace Safes.DAL.Abstraction
             return RepositoryContext.Set<TModel>().AsNoTracking();
         }
 
+        public IEnumerable<TModel> FindAllTakeSkip(int start, int end)
+        {
+            var propertyInfo = typeof(TModel).GetProperty("IsDeleted");
+            return RepositoryContext.Set<TModel>().Take(start).Skip(end).AsNoTracking();
+        }
+
         public IEnumerable<TModel> FindByCondition(Expression<Func<TModel, bool>> expression)
         {
             var propertyInfo = typeof(TModel).GetProperty("IsDeleted");

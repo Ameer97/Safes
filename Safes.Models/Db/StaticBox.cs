@@ -6,11 +6,12 @@ using System.Text;
 
 namespace Safes.Models.Db
 {
-    public class StaticBoxes
+    public class StaticBox
     {
         [Key]
         public int Id { get; set; }
-        public bool Status { get; set; }        // (Active : Inactive)
+        [DefaultValue(true)]
+        public bool IsActive { get; set; }        // (Active : Inactive)
         [Timestamp]
         public byte[] Timestamp { get; set; }
         [DefaultValue(false)]

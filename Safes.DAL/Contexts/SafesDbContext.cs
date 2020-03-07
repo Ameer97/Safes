@@ -29,7 +29,7 @@ namespace Safes.DAL.Contexts
         public DbSet<Owner> Owners { get; set; }
         public DbSet<Meditor> Meditors { get; set; }
         public DbSet<Box> Boxes { get; set; }
-        public DbSet<StaticBoxes> StaticBoxes { get; set; }
+        public DbSet<StaticBox> StaticBoxes { get; set; }
         public DbSet<StaticBoxReuse> StaticBoxReuses { get; set; }
         public DbSet<PlaceEvent> Events { get; set; }
         public DbSet<Role> Roles { get; set; }

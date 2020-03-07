@@ -58,8 +58,27 @@ namespace Safes.WebApi.Controllers
             return Ok(new ClientResponse<Box>(serviceResponse.Value));
         }
         #endregion
-        #region Static
-
+        #region StaticBox
+        [HttpGet]
+        [ProducesResponseType(typeof(ClientResponse<List<StaticBoxReuse>>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> GetStaticBoxes(int start, int end)
+        {
+            var serviceResponse = await _staticService.GetStaticBoxes(start, end);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<List<StaticBoxReuse>>(serviceResponse.Value));
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ClientResponse<StaticBoxReuse>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> CreateStaticBox(StaticBoxCreateDto box)
+        {
+            var serviceResponse = await _staticService.CreateStaticBox(box);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<StaticBoxReuse>(serviceResponse.Value));
+        }
         #endregion
         #region Event
 
