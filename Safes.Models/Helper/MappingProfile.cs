@@ -21,6 +21,7 @@ namespace Safes.Models.Helper
             //CreateMap<Meditor, PersonCreateDto>();
 
             CreateMap<StaticBoxCreateDto, StaticBoxReuse>();
+            CreateMap<EventCreateDto, PlaceEvent>();
 
         }
     }

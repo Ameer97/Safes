@@ -50,10 +50,15 @@ namespace Safes.ServiceLayer
             var StaticBox = await _repositoryWrapper.StaticBoxReuseRepository.CreateStaticBox(form);
             return new ServiceResponse<StaticBoxReuse>(StaticBox);
         }
-        public async Task<ServiceResponse<List<StaticBoxReuse>>> GetStaticBoxes(int start, int end)
+        public async Task<ServiceResponse<List<StaticBoxReuse>>> GetStaticBoxes(int? start, int? end)
         {
             var StaticBox = _repositoryWrapper.StaticBoxReuseRepository.FindAllTakeSkip(start, end).ToList();
-            return new ServiceResponse<List<StaticBoxReuse>>(StaticBox);
+            return (StaticBox.Any())
+                ? new ServiceResponse<List<StaticBoxReuse>>(StaticBox)
+                : new ServiceResponse<List<StaticBoxReuse>>(default)
+                {
+                    Error = new ResponseError("No Static Boxes Found")
+                };
         }
     }
 }

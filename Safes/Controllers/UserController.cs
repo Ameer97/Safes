@@ -81,7 +81,26 @@ namespace Safes.WebApi.Controllers
         }
         #endregion
         #region Event
-
+        [HttpGet]
+        [ProducesResponseType(typeof(ClientResponse<List<PlaceEvent>>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> GetEvents(int start, int end)
+        {
+            var serviceResponse = await _eventService.GetEvents(start, end);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<List<PlaceEvent>>(serviceResponse.Value));
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ClientResponse<PlaceEvent>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> CreateEvent(EventCreateDto Event)
+        {
+            var serviceResponse = await _eventService.CreateEvent(Event);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<PlaceEvent>(serviceResponse.Value));
+        }
         #endregion
         #region User
 

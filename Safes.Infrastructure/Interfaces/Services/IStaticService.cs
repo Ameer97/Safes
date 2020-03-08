@@ -9,7 +9,7 @@ namespace Safes.Infrastructure.Interfaces.Services
 {
     public interface IStaticService : IDisposable
     {
-        Task<ServiceResponse<List<StaticBoxReuse>>> GetStaticBoxes(int start, int end);
+        Task<ServiceResponse<List<StaticBoxReuse>>> GetStaticBoxes(int? start, int? end);
         Task<ServiceResponse<StaticBoxReuse>> CreateStaticBox(StaticBoxCreateDto form);
     }
 }
