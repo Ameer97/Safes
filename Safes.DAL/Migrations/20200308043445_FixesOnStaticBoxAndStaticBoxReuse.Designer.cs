@@ -10,8 +10,8 @@ using Safes.DAL.Contexts;
 namespace Safes.DAL.Migrations
 {
     [DbContext(typeof(SafesDbContext))]
-    [Migration("20200308034245_test")]
-    partial class test
+    [Migration("20200308043445_FixesOnStaticBoxAndStaticBoxReuse")]
+    partial class FixesOnStaticBoxAndStaticBoxReuse
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

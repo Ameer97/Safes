@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Safes.DAL.Migrations
 {
-    public partial class test : Migration
+    public partial class FixesOnStaticBoxAndStaticBoxReuse : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
