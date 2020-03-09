@@ -9,7 +9,7 @@ namespace Safes.Infrastructure.Interfaces.Services
 {
     public interface IEventService : IDisposable
     {
-        Task<ServiceResponse<List<PlaceEvent>>> GetEvents(int start, int end);
+        Task<ServiceResponse<List<PlaceEvent>>> GetEvents(int? start, int? end);
         Task<ServiceResponse<PlaceEvent>> CreateEvent(EventCreateDto form);
     }
 }

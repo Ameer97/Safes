@@ -40,7 +40,7 @@ namespace Safes.WebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(ClientResponse<List<Box>>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> GetBoxes(int start, int end)
+        public async Task<IActionResult> GetBoxes(int? start, int? end)
         {
             var serviceResponse = await _boxService.GetBoxes(start, end);
             if (serviceResponse.Error != null)
@@ -62,7 +62,7 @@ namespace Safes.WebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(ClientResponse<List<StaticBoxReuse>>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> GetStaticBoxes(int start, int end)
+        public async Task<IActionResult> GetStaticBoxes(int? start, int? end)
         {
             var serviceResponse = await _staticService.GetStaticBoxes(start, end);
             if (serviceResponse.Error != null)
@@ -84,7 +84,7 @@ namespace Safes.WebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(ClientResponse<List<PlaceEvent>>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> GetEvents(int start, int end)
+        public async Task<IActionResult> GetEvents(int? start, int? end)
         {
             var serviceResponse = await _eventService.GetEvents(start, end);
             if (serviceResponse.Error != null)

@@ -8,6 +8,6 @@ namespace Safes.Infrastructure.Interfaces.Repositories
 {
     public interface IBoxRepository : IRepositoryBase<Box>
     {
-        Task<List<Box>> GetBoxes(int start, int end);
+        //Task<List<Box>> GetBoxes(int start, int end);
     }
 }

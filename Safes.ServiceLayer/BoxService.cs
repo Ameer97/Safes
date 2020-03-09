@@ -35,12 +35,12 @@ namespace Safes.ServiceLayer
                     _repositoryWrapper.Dispose();
             _disposed = true;
         }
-        public async Task<ServiceResponse<List<Box>>> GetBoxes(int start, int end)
+        public async Task<ServiceResponse<List<Box>>> GetBoxes(int? start, int? end)
         {
-            var Boxes = await _repositoryWrapper.BoxRepository.GetBoxes(start, end);
+            var Boxes = _repositoryWrapper.BoxRepository.FindAllTakeSkip(start, end).ToList();
             return (Boxes.Any())
                 ? new ServiceResponse<List<Box>>(Boxes)
-                : new ServiceResponse<List<Box>>(null)
+                : new ServiceResponse<List<Box>>(default)
                 {
                     Error = new ResponseError("No Boxes Found")
                 };

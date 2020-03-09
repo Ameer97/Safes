@@ -35,7 +35,7 @@ namespace Safes.ServiceLayer
                     _repositoryWrapper.Dispose();
             _disposed = true;
         }
-        public async Task<ServiceResponse<List<PlaceEvent>>> GetEvents(int start, int end)
+        public async Task<ServiceResponse<List<PlaceEvent>>> GetEvents(int? start, int? end)
         {
             var Events = _repositoryWrapper.EventRepository.FindAllTakeSkip(start, end).ToList();
             return (Events.Any())

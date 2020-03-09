@@ -9,7 +9,7 @@ namespace Safes.Infrastructure.Interfaces.Services
 {
     public interface IBoxService : IDisposable
     {
-        Task<ServiceResponse<List<Box>>> GetBoxes(int start, int end);
+        Task<ServiceResponse<List<Box>>> GetBoxes(int? start, int? end);
         Task<ServiceResponse<Box>> CreateBox(BoxCreateDto form);
     }
 }
