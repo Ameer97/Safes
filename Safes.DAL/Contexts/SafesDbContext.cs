@@ -20,6 +20,10 @@ namespace Safes.DAL.Contexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Box>()
+                .HasIndex(b => b.BoxId)
+                .IsUnique();
         }
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
