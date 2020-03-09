@@ -35,9 +35,9 @@ namespace Safes.ServiceLayer
                     _repositoryWrapper.Dispose();
             _disposed = true;
         }
-        public async Task<ServiceResponse<List<Meditor>>> GetMeditors(int start, int end)
+        public async Task<ServiceResponse<List<Meditor>>> GetMeditors(int? start, int? end)
         {
-            var Meditors = _repositoryWrapper.MeditorRepository.FindAll().Skip(start).Take(end).ToList();
+            var Meditors = _repositoryWrapper.MeditorRepository.FindAllTakeSkip(start,end).ToList();
             return (Meditors.Any())
                 ? new ServiceResponse<List<Meditor>>(Meditors)
                 : new ServiceResponse<List<Meditor>>(null)

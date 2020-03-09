@@ -9,7 +9,7 @@ namespace Safes.Infrastructure.Interfaces.Services
 {
     public interface IMeditorService : IDisposable
     {
-        Task<ServiceResponse<List<Meditor>>> GetMeditors(int start, int end);
+        Task<ServiceResponse<List<Meditor>>> GetMeditors(int? start, int? end);
         Task<ServiceResponse<Meditor>> CreateOwner(PersonCreateDto form);
     }
 }

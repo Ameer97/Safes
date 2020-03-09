@@ -109,7 +109,7 @@ namespace Safes.WebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(ClientResponse<List<Box>>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> GetOwners(int start, int end)
+        public async Task<IActionResult> GetOwners(int? start, int? end)
         {
             var serviceResponse = await _ownerService.GetOwners(start, end);
             if (serviceResponse.Error != null)
@@ -131,7 +131,7 @@ namespace Safes.WebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(ClientResponse<List<Meditor>>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> GetMeditors(int start, int end)
+        public async Task<IActionResult> GetMeditors(int? start, int? end)
         {
             var serviceResponse = await _meditorService.GetMeditors(start, end);
             if (serviceResponse.Error != null)

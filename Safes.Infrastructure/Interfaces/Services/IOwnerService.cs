@@ -10,6 +10,6 @@ namespace Safes.Infrastructure.Interfaces.Services
     public interface IOwnerService : IDisposable
     {
         Task<ServiceResponse<Owner>> CreateOwner(PersonCreateDto form);
-        Task<ServiceResponse<List<Owner>>> GetOwners(int start, int end);
+        Task<ServiceResponse<List<Owner>>> GetOwners(int? start, int? end);
     }
 }

@@ -35,9 +35,9 @@ namespace Safes.ServiceLayer
                     _repositoryWrapper.Dispose();
             _disposed = true;
         }
-        public async Task<ServiceResponse<List<Owner>>> GetOwners(int start, int end)
+        public async Task<ServiceResponse<List<Owner>>> GetOwners(int? start, int? end)
         {
-            var Owners = _repositoryWrapper.OwnerRepository.FindAll().Skip(start).Take(end).ToList();
+            var Owners = _repositoryWrapper.OwnerRepository.FindAllTakeSkip(start, end).ToList();
             return (Owners.Any())
                 ? new ServiceResponse<List<Owner>>(Owners)
                 : new ServiceResponse<List<Owner>>(null)
