@@ -12,9 +12,17 @@ namespace Safes.Models.Db
         public int Id { get; set; }
         public string Name { get; set; }
         public List<Permission> Permissions { get; set; }
-        [Timestamp]
-        public byte[] Timestamp { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime? DateUpdated { get; set; }
         [DefaultValue(false)]
         public bool IsDeleted { get; set; }
+
+        public Role()
+        {
+            if (this.DateCreated.Year <= 2000 || this.DateCreated == null)
+                this.DateCreated = DateTime.Now;
+            else
+                this.DateUpdated = DateTime.Now;
+        }
     }
 }

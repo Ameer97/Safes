@@ -23,9 +23,17 @@ namespace Safes.Models.Db
         public bool IsStopped { get; set; }
         [DefaultValue(false)]
         public bool IsStaticBox { get; set; }
-        [Timestamp]
-        public byte[] Timestamp { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime? DateUpdated { get; set; }
         [DefaultValue(false)]
         public bool IsDeleted { get; set; }
+
+        public Owner()
+        {
+            if (this.DateCreated.Year <= 2000 || this.DateCreated == null)
+                this.DateCreated = DateTime.Now;
+            else
+                this.DateUpdated = DateTime.Now;
+        }
     }
 }

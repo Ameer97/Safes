@@ -27,10 +27,17 @@ namespace Safes.Models.Db
         [ForeignKey(nameof(RoleId))]
         public Role Role { get; set; }
         public string Note { get; set; }
-        [Timestamp]
-        public byte[] Timestamp { get; set; }
-
+        public DateTime DateCreated { get; set; }
+        public DateTime? DateUpdated { get; set; }
         [DefaultValue(false)]
         public bool IsDeleted { get; set; }
+
+        public User()
+        {
+            if (this.DateCreated.Year <= 2000 || this.DateCreated == null)
+                this.DateCreated = DateTime.Now;
+            else
+                this.DateUpdated = DateTime.Now;
+        }
     }
 }
