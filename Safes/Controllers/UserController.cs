@@ -67,6 +67,16 @@ namespace Safes.WebApi.Controllers
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
             return Ok(new ClientResponse<BoxDetailsDto>(serviceResponse.Value));
         }
+        [HttpPut]
+        [ProducesResponseType(typeof(ClientResponse<Box>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> UpdateReceivedBox(BoxUpdateReceivedDto box)
+        {
+            var serviceResponse = await _boxService.UpdateReceivedBox(box);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<Box>(serviceResponse.Value));
+        }
         #endregion
         #region StaticBox
         [HttpGet]
@@ -80,14 +90,24 @@ namespace Safes.WebApi.Controllers
             return Ok(new ClientResponse<List<StaticBoxReuse>>(serviceResponse.Value));
         }
         [HttpPost]
-        [ProducesResponseType(typeof(ClientResponse<StaticBoxReuse>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<StaticBoxAllReuseDto>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> CreateStaticBox(StaticBoxCreateDto box)
+        public async Task<IActionResult> CreateStaticBox(StaticBoxCreateDto StaticBox)
         {
-            var serviceResponse = await _staticService.CreateStaticBox(box);
+            var serviceResponse = await _staticService.CreateStaticBox(StaticBox);
             if (serviceResponse.Error != null)
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
-            return Ok(new ClientResponse<StaticBoxReuse>(serviceResponse.Value));
+            return Ok(new ClientResponse<StaticBoxAllReuseDto>(serviceResponse.Value));
+        }
+        [HttpGet]
+        [ProducesResponseType(typeof(ClientResponse<StaticBoxAllReuseDto>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> GetStaticBoxDetails(int SBoxId)
+        {
+            var serviceResponse = await _staticService.GetStaticBoxDetails(SBoxId);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<StaticBoxAllReuseDto>(serviceResponse.Value));
         }
         #endregion
         #region Event

@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Safes.DAL.Abstraction;
 using Safes.DAL.Contexts;
 using Safes.Infrastructure.Interfaces.Repositories;
 using Safes.Models.Db;
 using Safes.Models.Dto;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Threading.Tasks;
 
 namespace Safes.DAL.Repositories
@@ -22,21 +20,34 @@ namespace Safes.DAL.Repositories
             _context = RepositoryContext;
 
         }
-        public async Task<StaticBoxReuse> CreateStaticBox(StaticBoxCreateDto form)
+        public async Task CreateStaticBox(StaticBoxCreateDto form)
         {
-            var StaticBox = new StaticBox();
-            await _context.StaticBoxes.AddAsync(StaticBox);
-            var StaticBoxReuse = await CreateStaticBoxReuse(form, StaticBox.Id);
+            //var StaticBox = new StaticBox
+            //{
+            //    SBoxId = form.StaticBoxId,
+            //    DateCreated = DateTime.Now
+            //};
+            // _context.StaticBoxes.Add(StaticBox);
+            //_context.SaveChanges();
 
-            return StaticBoxReuse;
+            //form.StaticBoxId = StaticBox.Id;
+            await CreateStaticBoxReuse(form);
         }
-        public async Task<StaticBoxReuse> CreateStaticBoxReuse(StaticBoxCreateDto form, int StaticBoxId)
+        public async Task CreateStaticBoxReuse(StaticBoxCreateDto form)
         {
-            var StaticBoxReuse = _mapper.Map<StaticBoxReuse>(form);
-            StaticBoxReuse.StaticBoxId = StaticBoxId;
-            await _context.StaticBoxReuses.AddAsync(StaticBoxReuse);
+            var StaticBoxReuse = new StaticBoxReuse
+            {
+                StaticBoxId = form.StaticBoxId,
+                DateFrom = form.DateFrom,
+                MeditorId = form.MeditorId,
+                OwnerId = form.OwnerId,
+                Address = form.Address,
+                Note = form.Note,
+                DateCreated = DateTime.Now
+            };
+            _context.StaticBoxReuses.Add(StaticBoxReuse);
+            _context.SaveChanges();
 
-            return StaticBoxReuse;
         }
     }
 }

@@ -24,6 +24,10 @@ namespace Safes.DAL.Contexts
             modelBuilder.Entity<Box>()
                 .HasIndex(b => b.BoxId)
                 .IsUnique();
+
+            modelBuilder.Entity<StaticBox>()
+                .HasIndex(b => b.SBoxId)
+                .IsUnique();
         }
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{

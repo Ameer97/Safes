@@ -10,19 +10,13 @@ namespace Safes.Models.Db
     {
         [Key]
         public int Id { get; set; }
+        public int SBoxId { get; set; }
         [DefaultValue(true)]
         public bool IsActive { get; set; }        // (Active : Inactive)
+        public List<StaticBoxReuse> StaticBoxReuses { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateUpdated { get; set; }
         [DefaultValue(false)]
         public bool IsDeleted { get; set; }
-
-        public StaticBox()
-        {
-            if (this.DateCreated.Year <= 2000 || this.DateCreated == null)
-                this.DateCreated = DateTime.Now;
-            else
-                this.DateUpdated = DateTime.Now;
-        }
     }
 }

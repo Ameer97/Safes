@@ -45,10 +45,10 @@ namespace Safes.ServiceLayer
         //            Error = new ResponseError("No Owners Found")
         //        };
         //}
-        public async Task<ServiceResponse<StaticBoxReuse>> CreateStaticBox(StaticBoxCreateDto form)
+        public async Task<ServiceResponse<StaticBoxAllReuseDto>> CreateStaticBox(StaticBoxCreateDto form)
         {
-            var StaticBox = await _repositoryWrapper.StaticBoxReuseRepository.CreateStaticBox(form);
-            return new ServiceResponse<StaticBoxReuse>(StaticBox);
+            await _repositoryWrapper.StaticBoxReuseRepository.CreateStaticBox(form);
+            return await GetStaticBoxDetails(form.StaticBoxId);
         }
         public async Task<ServiceResponse<List<StaticBoxReuse>>> GetStaticBoxes(int? start, int? end)
         {
@@ -56,6 +56,22 @@ namespace Safes.ServiceLayer
             return (StaticBox.Any())
                 ? new ServiceResponse<List<StaticBoxReuse>>(StaticBox)
                 : new ServiceResponse<List<StaticBoxReuse>>(default)
+                {
+                    Error = new ResponseError("No Static Boxes Found")
+                };
+        }
+        public async Task<ServiceResponse<StaticBoxAllReuseDto>> GetStaticBoxDetails(int SBoxId)
+        {
+            if (SBoxId <= 0)
+                return new ServiceResponse<StaticBoxAllReuseDto>(default)
+                {
+                    Error = new ResponseError("invalid SBoxId")
+                };
+
+        var StaticBox = _repositoryWrapper.StaticRepository.StaticBoxLog(SBoxId).Result;
+            return (StaticBox != null)
+                ? new ServiceResponse<StaticBoxAllReuseDto>(StaticBox)
+                : new ServiceResponse<StaticBoxAllReuseDto>(default)
                 {
                     Error = new ResponseError("No Static Boxes Found")
                 };

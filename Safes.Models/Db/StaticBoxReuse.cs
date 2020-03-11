@@ -16,10 +16,10 @@ namespace Safes.Models.Db
         [ForeignKey(nameof(StaticBoxId))]
         public StaticBox StaticBoxes { get; set; }
 
-        public DateTime? DateFrom { get; set; }
+        public DateTime DateFrom { get; set; }
         public DateTime? DateTo { get; set; }
         [DefaultValue(0)]
-        public decimal Amount { get; set; }
+        public decimal? Amount { get; set; }
 
         public int OwnerId { get; set; }
         [ForeignKey(nameof(OwnerId))]
@@ -29,19 +29,11 @@ namespace Safes.Models.Db
         [ForeignKey(nameof(MeditorId))]
         public Meditor Meditor { get; set; }
 
-        public string Note { get; set; }
-        public string Address { get; set; }
+        public string? Note { get; set; }
+        public string? Address { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateUpdated { get; set; }
         [DefaultValue(false)]
         public bool IsDeleted { get; set; }
-
-        public StaticBoxReuse()
-        {
-            if (this.DateCreated.Year <= 2000 || this.DateCreated == null)
-                this.DateCreated = DateTime.Now;
-            else
-                this.DateUpdated = DateTime.Now;
-        }
     }
 }

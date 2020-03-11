@@ -48,7 +48,8 @@ namespace Safes.ServiceLayer
         public async Task<ServiceResponse<Box>> CreateBox(BoxCreateDto form)
         {
             var Box = _mapper.Map<Box>(form);
-             _repositoryWrapper.BoxRepository.Insert(Box);
+            Box.DateCreated = DateTime.Now;
+            _repositoryWrapper.BoxRepository.Insert(Box);
             return new ServiceResponse<Box>(Box);
         }
         public async Task<ServiceResponse<BoxDetailsDto>> BoxDetails(int SearchId, bool IsBoxId = true)
@@ -65,6 +66,19 @@ namespace Safes.ServiceLayer
                 {
                     Error = new ResponseError("No Boxes Found")
                 };
+        }
+        public async Task<ServiceResponse<Box>> UpdateReceivedBox(BoxUpdateReceivedDto form)
+        {
+            var Box = await _repositoryWrapper.BoxRepository.FindBoxId(form.BoxId);
+            if (Box == null)
+                return new ServiceResponse<Box>(default)
+                {
+                    Error = new ResponseError("Invalid SearchId")
+                };
+            _mapper.Map(form, Box);
+            Box.DateUpdated = DateTime.Now;
+            _repositoryWrapper.BoxRepository.Update(Box);
+            return new ServiceResponse<Box>(Box);
         }
     }
 }

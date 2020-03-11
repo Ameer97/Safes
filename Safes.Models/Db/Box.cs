@@ -27,13 +27,5 @@ namespace Safes.Models.Db
         public DateTime? DateUpdated { get; set; }
         [DefaultValue(false)]
         public bool IsDeleted { get; set; }
-
-        public Box()
-        {
-            if(this.DateCreated.Year <= 2000 || this.DateCreated == null)
-                this.DateCreated = DateTime.Now;
-            else
-                this.DateUpdated = DateTime.Now;
-        }
     }
 }

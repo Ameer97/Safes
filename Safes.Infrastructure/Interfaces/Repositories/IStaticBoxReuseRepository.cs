@@ -6,6 +6,6 @@ namespace Safes.Infrastructure.Interfaces.Repositories
 {
     public interface IStaticBoxReuseRepository : IRepositoryBase<StaticBoxReuse>
     {
-        Task<StaticBoxReuse> CreateStaticBox(StaticBoxCreateDto form);
+        Task CreateStaticBox(StaticBoxCreateDto form);
     }
 }

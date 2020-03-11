@@ -10,5 +10,6 @@ namespace Safes.Infrastructure.Interfaces.Repositories
     public interface IBoxRepository : IRepositoryBase<Box>
     {
         Task<BoxDetailsDto> GetBoxDetails(int SearchId, bool IsBoxId = true);
+        Task<Box> FindBoxId(int BoxId);
     }
 }

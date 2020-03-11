@@ -13,6 +13,7 @@ namespace Safes.Models.Helper
         {
             //CreateMap<Box, BoxCreateDto>();
             CreateMap<BoxCreateDto, Box>();
+            CreateMap<BoxUpdateReceivedDto, Box>();
 
             CreateMap<PersonCreateDto, Owner>();
             //CreateMap<Owner, PersonCreateDto>();
@@ -21,7 +22,13 @@ namespace Safes.Models.Helper
             //CreateMap<Meditor, PersonCreateDto>();
 
             CreateMap<StaticBoxCreateDto, StaticBoxReuse>();
+
+            CreateMap<StaticBoxReuse, StaticBoxReuseForViewDto>();
+            CreateMap<StaticBox, StaticBoxAllReuseDto>();
+
+
             CreateMap<EventCreateDto, PlaceEvent>();
+
 
         }
     }

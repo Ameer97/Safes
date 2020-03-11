@@ -20,6 +20,10 @@ namespace Safes.DAL.Repositories
         {
             _context = RepositoryContext;
         }
+        public async Task<Box> FindBoxId(int BoxId)
+        {
+            return await _context.Boxes.Where(b => b.BoxId == BoxId).FirstOrDefaultAsync();
+        }
         public async Task<BoxDetailsDto> GetBoxDetails(int SearchId, bool IsBoxId = true)
         {
             return (IsBoxId)
