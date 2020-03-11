@@ -77,6 +77,16 @@ namespace Safes.WebApi.Controllers
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
             return Ok(new ClientResponse<Box>(serviceResponse.Value));
         }
+        [HttpGet]
+        [ProducesResponseType(typeof(ClientResponse<bool>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> GetIsReceivedOrNot(int BoxId)
+        {
+            var serviceResponse = await _boxService.IsReceived(BoxId);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<bool>(serviceResponse.Value));
+        }
         #endregion
         #region StaticBox
         [HttpGet]

@@ -13,5 +13,6 @@ namespace Safes.Infrastructure.Interfaces.Services
         Task<ServiceResponse<Box>> CreateBox(BoxCreateDto form);
         Task<ServiceResponse<BoxDetailsDto>> BoxDetails(int SearchId, bool IsBoxId = true);
         Task<ServiceResponse<Box>> UpdateReceivedBox(BoxUpdateReceivedDto form);
+        Task<ServiceResponse<bool>> IsReceived(int BoxId);
     }
 }

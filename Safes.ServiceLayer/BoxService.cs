@@ -80,5 +80,23 @@ namespace Safes.ServiceLayer
             _repositoryWrapper.BoxRepository.Update(Box);
             return new ServiceResponse<Box>(Box);
         }
+        public async Task<ServiceResponse<bool>> IsReceived(int BoxId)
+        {
+            if (BoxId <= 0)
+                return new ServiceResponse<bool>(default)
+                {
+                    Error = new ResponseError("Invalid BoxId")
+                };
+
+            var Box = await _repositoryWrapper.BoxRepository.FindBoxId(BoxId);
+            if (Box == null)
+                return new ServiceResponse<bool>(default)
+                {
+                    Error = new ResponseError("Box Not Found")
+                };
+            return (Box.Amount.HasValue)
+                ? new ServiceResponse<bool>(true)
+                : new ServiceResponse<bool>(false);
+        }
     }
 }
