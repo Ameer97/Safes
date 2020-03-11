@@ -11,6 +11,8 @@
     <Compile Remove="Migrations\20200302172149_AddingEventToBoxTable.Designer.cs" />
     <Compile Remove="Migrations\20200308034245_test.cs" />
     <Compile Remove="Migrations\20200308034245_test.Designer.cs" />
+    <Compile Remove="Migrations\20200311085734_SetterInDateCreatedInBoxTable.cs" />
+    <Compile Remove="Migrations\20200311085734_SetterInDateCreatedInBoxTable.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

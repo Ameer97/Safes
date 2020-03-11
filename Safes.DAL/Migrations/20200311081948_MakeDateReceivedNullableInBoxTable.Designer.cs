@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Safes.DAL.Contexts;
@@ -9,9 +10,10 @@ using Safes.DAL.Contexts;
 namespace Safes.DAL.Migrations
 {
     [DbContext(typeof(SafesDbContext))]
-    partial class SafesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200311081948_MakeDateReceivedNullableInBoxTable")]
+    partial class MakeDateReceivedNullableInBoxTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,9 +33,6 @@ namespace Safes.DAL.Migrations
 
                     b.Property<int>("BoxId")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("DateDeliverd")
                         .HasColumnType("timestamp without time zone");
@@ -55,6 +54,11 @@ namespace Safes.DAL.Migrations
 
                     b.Property<int>("OwnerId")
                         .HasColumnType("integer");
+
+                    b.Property<byte[]>("Timestamp")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea");
 
                     b.HasKey("Id");
 

@@ -57,6 +57,16 @@ namespace Safes.WebApi.Controllers
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
             return Ok(new ClientResponse<Box>(serviceResponse.Value));
         }
+        [HttpGet]
+        [ProducesResponseType(typeof(ClientResponse<List<BoxDetailsDto>>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> BoxDetails(int SearchId, bool IsBoxId = true)
+        {
+            var serviceResponse = await _boxService.BoxDetails(SearchId, IsBoxId);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<BoxDetailsDto>(serviceResponse.Value));
+        }
         #endregion
         #region StaticBox
         [HttpGet]

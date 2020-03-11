@@ -50,11 +50,21 @@ namespace Safes.ServiceLayer
             var Box = _mapper.Map<Box>(form);
              _repositoryWrapper.BoxRepository.Insert(Box);
             return new ServiceResponse<Box>(Box);
-                //? 
-                //: new ServiceResponse<Box>(null)
-                //{
-                //    Error = new ResponseError("No Boxes Found")
-                //};
+        }
+        public async Task<ServiceResponse<BoxDetailsDto>> BoxDetails(int SearchId, bool IsBoxId = true)
+        {
+            if (SearchId <= 0)
+                return new ServiceResponse<BoxDetailsDto>(default)
+                {
+                    Error = new ResponseError("Invalid SearchId")
+                };
+            var BoxDetails = _repositoryWrapper.BoxRepository.GetBoxDetails(SearchId, IsBoxId).Result;
+            return (BoxDetails != null)
+                ? new ServiceResponse<BoxDetailsDto>(BoxDetails)
+                : new ServiceResponse<BoxDetailsDto>(default)
+                {
+                    Error = new ResponseError("No Boxes Found")
+                };
         }
     }
 }

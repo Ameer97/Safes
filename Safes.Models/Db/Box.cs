@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Safes.Models.Db
 {
@@ -22,13 +20,20 @@ namespace Safes.Models.Db
         [ForeignKey(nameof(EventId))]
         public PlaceEvent Event { get; set; }
         public DateTime DateDeliverd { get; set; }
-        public DateTime DateReceived { get; set; }
+        public DateTime? DateReceived { get; set; }
         public int? Amount { get; set; }
         public string Note { get; set; }
-        [Timestamp]
-        public byte[] Timestamp { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime? DateUpdated { get; set; }
         [DefaultValue(false)]
         public bool IsDeleted { get; set; }
 
+        public Box()
+        {
+            if(this.DateCreated.Year <= 2000 || this.DateCreated == null)
+                this.DateCreated = DateTime.Now;
+            else
+                this.DateUpdated = DateTime.Now;
+        }
     }
 }
