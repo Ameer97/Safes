@@ -12,5 +12,7 @@ namespace Safes.Infrastructure.Interfaces.Services
         Task<ServiceResponse<List<StaticBoxReuse>>> GetStaticBoxes(int? start, int? end);
         Task<ServiceResponse<StaticBoxAllReuseDto>> GetStaticBoxDetails(int SBoxId);
         Task<ServiceResponse<StaticBoxAllReuseDto>> CreateStaticBox(StaticBoxCreateDto form);
+        Task<ServiceResponse<StaticBoxAllReuseDto>> UpdateReceivedReuseStatic(ReceivedReuseStaticDto ReceivedReuse);
+        Task<ServiceResponse<StaticBoxAllReuseDto>> CreateReuseStatic(StaticBoxCreateDto form);
     }
 }

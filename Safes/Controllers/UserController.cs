@@ -119,6 +119,26 @@ namespace Safes.WebApi.Controllers
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
             return Ok(new ClientResponse<StaticBoxAllReuseDto>(serviceResponse.Value));
         }
+        [HttpPost]
+        [ProducesResponseType(typeof(ClientResponse<StaticBoxAllReuseDto>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> CreateReuseStatic(StaticBoxCreateDto StaticBox)
+        {
+            var serviceResponse = await _staticService.CreateReuseStatic(StaticBox);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<StaticBoxAllReuseDto>(serviceResponse.Value));
+        }
+        [HttpPut]
+        [ProducesResponseType(typeof(ClientResponse<StaticBoxAllReuseDto>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> UpdateReceivedStaticBox(ReceivedReuseStaticDto ReceivedReuse)
+        {
+            var serviceResponse = await _staticService.UpdateReceivedReuseStatic(ReceivedReuse);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<StaticBoxAllReuseDto>(serviceResponse.Value));
+        }
         #endregion
         #region Event
         [HttpGet]

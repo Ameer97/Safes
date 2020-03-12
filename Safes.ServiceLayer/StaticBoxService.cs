@@ -50,6 +50,22 @@ namespace Safes.ServiceLayer
             await _repositoryWrapper.StaticBoxReuseRepository.CreateStaticBox(form);
             return await GetStaticBoxDetails(form.StaticBoxId);
         }
+        public async Task<ServiceResponse<StaticBoxAllReuseDto>> GetStaticBoxDetails(int SBoxId)
+        {
+            if (SBoxId <= 0)
+                return new ServiceResponse<StaticBoxAllReuseDto>(default)
+                {
+                    Error = new ResponseError("invalid SBoxId")
+                };
+
+            var StaticBox = await _repositoryWrapper.StaticRepository.StaticBoxLog(SBoxId, false);
+            return (StaticBox != null)
+                ? new ServiceResponse<StaticBoxAllReuseDto>(StaticBox)
+                : new ServiceResponse<StaticBoxAllReuseDto>(default)
+                {
+                    Error = new ResponseError("No Static Boxes Found")
+                };
+        }
         public async Task<ServiceResponse<List<StaticBoxReuse>>> GetStaticBoxes(int? start, int? end)
         {
             var StaticBox = _repositoryWrapper.StaticBoxReuseRepository.FindAllTakeSkip(start, end).ToList();
@@ -60,21 +76,45 @@ namespace Safes.ServiceLayer
                     Error = new ResponseError("No Static Boxes Found")
                 };
         }
-        public async Task<ServiceResponse<StaticBoxAllReuseDto>> GetStaticBoxDetails(int SBoxId)
+        public async Task<ServiceResponse<StaticBoxAllReuseDto>> CreateReuseStatic(StaticBoxCreateDto form)
         {
-            if (SBoxId <= 0)
+            if (form.StaticBoxId <= 0)
                 return new ServiceResponse<StaticBoxAllReuseDto>(default)
                 {
-                    Error = new ResponseError("invalid SBoxId")
+                    Error = new ResponseError("Invalid StaticBox")
                 };
-
-        var StaticBox = _repositoryWrapper.StaticRepository.StaticBoxLog(SBoxId).Result;
-            return (StaticBox != null)
-                ? new ServiceResponse<StaticBoxAllReuseDto>(StaticBox)
-                : new ServiceResponse<StaticBoxAllReuseDto>(default)
+            var StaticBox = await _repositoryWrapper.StaticRepository.FindSBox(form.StaticBoxId);
+            if (StaticBox == null)
+                return new ServiceResponse<StaticBoxAllReuseDto>(default)
                 {
-                    Error = new ResponseError("No Static Boxes Found")
+                    Error = new ResponseError("StaticBox Not Found")
                 };
+            var SBoxId = form.StaticBoxId;
+            form.StaticBoxId = StaticBox.Id;
+            var StaticBoxReuse = _mapper.Map<StaticBoxCreateDto, StaticBoxReuse>(form);
+            _repositoryWrapper.StaticBoxReuseRepository.Insert(StaticBoxReuse);
+
+            var MyStaticBox = await _repositoryWrapper.StaticRepository.StaticBoxLog(SBoxId, true);
+            return new ServiceResponse<StaticBoxAllReuseDto>(MyStaticBox);
+        }
+        public async Task<ServiceResponse<StaticBoxAllReuseDto>> UpdateReceivedReuseStatic(ReceivedReuseStaticDto ReceivedReuse)
+        {
+            if (ReceivedReuse.StaticBoxId <= 0)
+                return new ServiceResponse<StaticBoxAllReuseDto>(default)
+                {
+                    Error = new ResponseError("Invalid StaticBoxId")
+                };
+            var StaticBox = await _repositoryWrapper.StaticBoxReuseRepository.FindSBox(ReceivedReuse.StaticBoxId);
+            if (StaticBox == null)
+                return new ServiceResponse<StaticBoxAllReuseDto>(default)
+                {
+                    Error = new ResponseError("Invalid StaticBox")
+                };
+            _mapper.Map(ReceivedReuse, StaticBox);
+            StaticBox.DateUpdated = DateTime.Now;
+            _repositoryWrapper.StaticBoxReuseRepository.Update(StaticBox);
+            var MyStaticBox = await _repositoryWrapper.StaticRepository.StaticBoxLog(StaticBox.StaticBoxId, true);
+            return new ServiceResponse<StaticBoxAllReuseDto>(MyStaticBox);
         }
     }
 }

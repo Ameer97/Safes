@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Safes.DAL.Abstraction;
 using Safes.DAL.Contexts;
 using Safes.Infrastructure.Interfaces.Repositories;
 using Safes.Models.Db;
 using Safes.Models.Dto;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Safes.DAL.Repositories
@@ -22,15 +24,15 @@ namespace Safes.DAL.Repositories
         }
         public async Task CreateStaticBox(StaticBoxCreateDto form)
         {
-            //var StaticBox = new StaticBox
-            //{
-            //    SBoxId = form.StaticBoxId,
-            //    DateCreated = DateTime.Now
-            //};
-            // _context.StaticBoxes.Add(StaticBox);
-            //_context.SaveChanges();
+            var StaticBox = new StaticBox
+            {
+                SBoxId = form.StaticBoxId,
+                DateCreated = DateTime.Now
+            };
+            _context.StaticBoxes.Add(StaticBox);
+            _context.SaveChanges();
 
-            //form.StaticBoxId = StaticBox.Id;
+            form.StaticBoxId = StaticBox.Id;
             await CreateStaticBoxReuse(form);
         }
         public async Task CreateStaticBoxReuse(StaticBoxCreateDto form)
@@ -48,6 +50,10 @@ namespace Safes.DAL.Repositories
             _context.StaticBoxReuses.Add(StaticBoxReuse);
             _context.SaveChanges();
 
+        }
+        public async Task<StaticBoxReuse> FindSBox(int SBoxId)
+        {
+            return await _context.StaticBoxReuses.Where(b => b.StaticBoxId == SBoxId).OrderByDescending(s => s.DateFrom).FirstOrDefaultAsync();
         }
     }
 }

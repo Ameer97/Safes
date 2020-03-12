@@ -9,6 +9,7 @@ namespace Safes.Infrastructure.Interfaces.Repositories
 {
     public interface IStaticRepository : IRepositoryBase<StaticBox>
     {
-        Task<StaticBoxAllReuseDto> StaticBoxLog(int SBoxId);
+        Task<StaticBoxAllReuseDto> StaticBoxLog(int SBoxId, bool WithAllReuses = false);
+        Task<StaticBox> FindSBox(int SBoxId);
     }
 }

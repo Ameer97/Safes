@@ -29,8 +29,11 @@ namespace Safes.Models.Db
         [ForeignKey(nameof(MeditorId))]
         public Meditor Meditor { get; set; }
 
-        public string? Note { get; set; }
-        public string? Address { get; set; }
+        [DefaultValue("")]
+        public string Note { get; set; }
+        [DefaultValue("")]
+        public string Address { get; set; }
+
         public DateTime DateCreated { get; set; }
         public DateTime? DateUpdated { get; set; }
         [DefaultValue(false)]

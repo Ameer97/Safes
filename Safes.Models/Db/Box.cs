@@ -27,6 +27,7 @@ namespace Safes.Models.Db
         public DateTime? DateReceived { get; set; }
 
         public int? Amount { get; set; }
+        [DefaultValue("")]
         public string Note { get; set; }
 
         public DateTime DateCreated { get; set; }
