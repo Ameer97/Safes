@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Safes.DAL.Abstraction;
 using Safes.DAL.Contexts;
+using Safes.Infrastructure.Enums;
 using Safes.Infrastructure.Interfaces.Repositories;
 using Safes.Models.Db;
 using Safes.Models.Dto;
@@ -65,5 +66,35 @@ namespace Safes.DAL.Repositories
                 .FirstOrDefaultAsync();
 
         }
+        #region Statistics
+        public async Task<BoxCountDto> BoxCount(int? Year = 0, bool? JustThisYear = false, bool? FromStartUntilYear = false)
+        {                                                                             //FromStartToYear
+            // 0 true true = all
+            // 
+            var ActiveBoxes = ((Year ?? 0) == 0) 
+                ? await _context.Boxes.Where(b => b.IsDeleted == false).ToListAsync()
+                : (JustThisYear ?? false) 
+                    ? await _context.Boxes.Where(b => b.IsDeleted == false && b.DateDeliverd.Year == Year).ToListAsync()
+                    : (FromStartUntilYear ?? false)
+                        ? await _context.Boxes.Where(b => b.IsDeleted == false && b.DateDeliverd.Year <= Year).ToListAsync()
+                        : await _context.Boxes.Where(b => b.IsDeleted == false && b.DateDeliverd.Year >= Year).ToListAsync();
+
+            var Delived = ActiveBoxes.Where(b => b.Amount == null).ToList().Count;
+            var Received = ActiveBoxes.Where(b => b.Amount != null).ToList().Count;
+            var Late = ActiveBoxes.Where(b => DateTime.Now.Subtract(b.DateDeliverd).Days >= 365).ToList().Count;
+            var TooLate = ActiveBoxes.Where(b => DateTime.Now.Subtract(b.DateDeliverd).Days >= 730).ToList().Count;
+
+            var BoxesCount = new BoxCountDto
+            {
+                Total = ActiveBoxes.Count,
+                Delivered = Delived,
+                Received = Received,
+                Late = Late,
+                TooLate = TooLate
+            };
+            return BoxesCount;
+        
+        }
+        #endregion
     }
 }

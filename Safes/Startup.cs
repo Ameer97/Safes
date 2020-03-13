@@ -64,6 +64,7 @@ namespace Safes
             services.AddScoped<IOwnerService, OwnerService>();
             services.AddScoped<IMeditorService, MeditorService>();
             services.AddScoped<IEventService, EventService>();
+            services.AddScoped<IStatisticsService, StatisticsService>();
 
 
             services.AddSwaggerGen(c =>

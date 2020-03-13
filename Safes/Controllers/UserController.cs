@@ -21,12 +21,14 @@ namespace Safes.WebApi.Controllers
         private IUserService _userService;
         private IBoxService _boxService;
         private IStaticService _staticService;
+        private IStatisticsService _statisticsService;
 
         public UserController(IBoxService boxService,
                               IUserService userService,
                               IStaticService staticService,
                               IOwnerService ownerService,
                               IMeditorService meditorService,
+                              IStatisticsService statisticsService,
                               IEventService eventService)
         {
             _eventService = eventService;
@@ -35,6 +37,7 @@ namespace Safes.WebApi.Controllers
             _userService = userService;
             _boxService = boxService;
             _staticService = staticService;
+            _statisticsService = statisticsService;
         }
         #region Box
         [HttpGet]
@@ -207,6 +210,18 @@ namespace Safes.WebApi.Controllers
             if (serviceResponse.Error != null)
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
             return Ok(new ClientResponse<Meditor>(serviceResponse.Value));
+        }
+        #endregion
+        #region Statistics
+        [HttpGet]
+        [ProducesResponseType(typeof(ClientResponse<BoxCountDto>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> BoxesCount(int? Year, bool? JustThisYear, bool? FromStartUntilYear)
+        {
+            var serviceResponse = await _statisticsService.BoxesCount(Year, JustThisYear, FromStartUntilYear);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<BoxCountDto>(serviceResponse.Value));
         }
         #endregion
     }
