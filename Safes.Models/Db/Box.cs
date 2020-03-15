@@ -15,7 +15,7 @@ namespace Safes.Models.Db
         [ForeignKey(nameof(MeditorId))]
         public Meditor Meditor { get; set; }
 
-        public int OwnerId { get; set; }
+        public int? OwnerId { get; set; }
         [ForeignKey(nameof(OwnerId))]
         public Owner Owner { get; set; }
 

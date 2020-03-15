@@ -90,6 +90,16 @@ namespace Safes.WebApi.Controllers
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
             return Ok(new ClientResponse<bool>(serviceResponse.Value));
         }
+        [HttpPost]
+        [ProducesResponseType(typeof(ClientResponse<string>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> CreateBoxRange(AssignBoxesToMeditorDto boxes)
+        {
+            var serviceResponse = await _boxService.AssignBoxesoMeditor(boxes);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<string>(serviceResponse.Value));
+        }
         #endregion
         #region StaticBox
         [HttpGet]

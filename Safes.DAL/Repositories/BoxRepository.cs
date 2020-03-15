@@ -66,6 +66,7 @@ namespace Safes.DAL.Repositories
                 .FirstOrDefaultAsync();
 
         }
+
         #region Statistics
         public async Task<BoxCountDto> BoxCount(int? Year = 0, bool? JustThisYear = false, bool? FromStartUntilYear = false)
         {                                                                             //FromStartToYear
