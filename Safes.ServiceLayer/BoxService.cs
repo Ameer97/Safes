@@ -137,7 +137,8 @@ namespace Safes.ServiceLayer
             }
             _repositoryWrapper.BoxRepository.InsertRange(BoxesListRange);
             return new ServiceResponse<string>((Boxes.End - Boxes.Begain + 1) + " box(es) had been added to meditor "
-                + Meditor.Result.FirstName + "from " + Boxes.Begain + "until" + Boxes.End);
+                + Meditor.Result.FirstName + " from " + Boxes.Begain + " until " + Boxes.End);
         }
+
     }
 }

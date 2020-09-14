@@ -65,6 +65,7 @@ namespace Safes
             services.AddScoped<IMeditorService, MeditorService>();
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IStatisticsService, StatisticsService>();
+            services.AddScoped<IThankService, ThankService>();
 
 
             services.AddSwaggerGen(c =>
@@ -80,7 +81,12 @@ namespace Safes
                 //c.OperationFilter<SecurityRequirementsOperationFilter>();
             });
 
-
+            services.AddCors(o => o.AddPolicy("TestEnv", builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            }));
 
             services.AddControllers();
         }
@@ -92,6 +98,7 @@ namespace Safes
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseCors("TestEnv");
 
             //app.UseRouting();
             app.UseSwagger();

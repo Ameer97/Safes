@@ -90,7 +90,7 @@ namespace Safes.DAL.Repositories
                 Total = ActiveBoxes.Count,
                 Delivered = Delived,
                 Received = Received,
-                Late = Late,
+                Late = Late - TooLate,
                 TooLate = TooLate
             };
             return BoxesCount;

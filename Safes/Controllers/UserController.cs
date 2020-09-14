@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Threading.Tasks;
 using Enjaz.Isp.Infrastructure.Helpers;
@@ -22,12 +23,14 @@ namespace Safes.WebApi.Controllers
         private IBoxService _boxService;
         private IStaticService _staticService;
         private IStatisticsService _statisticsService;
+        private IThankService _thankService;
 
         public UserController(IBoxService boxService,
                               IUserService userService,
                               IStaticService staticService,
                               IOwnerService ownerService,
                               IMeditorService meditorService,
+                              IThankService thankService,
                               IStatisticsService statisticsService,
                               IEventService eventService)
         {
@@ -38,6 +41,7 @@ namespace Safes.WebApi.Controllers
             _boxService = boxService;
             _staticService = staticService;
             _statisticsService = statisticsService;
+            _thankService = thankService;
         }
         #region Box
         [HttpGet]
@@ -232,6 +236,62 @@ namespace Safes.WebApi.Controllers
             if (serviceResponse.Error != null)
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
             return Ok(new ClientResponse<BoxCountDto>(serviceResponse.Value));
+        }
+        #endregion
+        #region Thank
+        [HttpPost]
+        [ProducesResponseType(typeof(ClientResponse<Thank>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> CreateThank(ThankCreateDto input)
+        {
+            var serviceResponse = await _thankService.Create(input);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<Thank>(serviceResponse.Value));
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(ClientResponse<List<ThankCreateDto>>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> Gethanks(int? start, int? end)
+        {
+            var serviceResponse = await _thankService.GetThanks(start, end);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<List<ThankCreateDto>>(serviceResponse.Value));
+        }
+
+        [HttpPost]
+        [ProducesResponseType(typeof(ClientResponse<List<Thank>>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> CreateThanks(ThankCreateListDto input)
+        {
+            var serviceResponse = await _thankService.CreateList(input);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<List<Thank>>(serviceResponse.Value));
+        }
+
+        [HttpPost]
+        [ProducesResponseType(typeof(ClientResponse<List<Thank>>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> CreateTest(ThankCreateListDto input)
+        {
+            var serviceResponse = new ServiceResponse<string>(input.Note);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<string>(serviceResponse.Value));
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(ClientResponse<DateTime?>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> GetLastThankDateToPerson(int ReferenceId, int ReferenceTypeId)
+        {
+            var serviceResponse = await _thankService.GetLastThankDateToPerson(ReferenceId, ReferenceTypeId);
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<DateTime?>(serviceResponse.Value));
         }
         #endregion
     }

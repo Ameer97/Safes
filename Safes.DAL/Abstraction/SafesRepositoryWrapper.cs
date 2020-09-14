@@ -11,6 +11,7 @@ namespace Safes.DAL.Abstraction
     public class SafesRepositoryWrapper : ISafesRepositoryWrapper
     {
         private IBoxRepository _boxRepository;
+        private IThankRepository _thankRepository;
         private IStaticRepository _staticRepository;
         private IStaticBoxReuseRepository _staticBoxReuseRepository;
         private IUserRepository _userRepository;
@@ -31,6 +32,7 @@ namespace Safes.DAL.Abstraction
         }
 
         public IBoxRepository BoxRepository => _boxRepository ??= new BoxRepository(_context);
+        public IThankRepository ThankRepository => _thankRepository ??= new ThankRepository(_context);
 
         public IStaticRepository StaticRepository => _staticRepository ??= new StaticRepository(_context);
         public IStaticBoxReuseRepository StaticBoxReuseRepository => _staticBoxReuseRepository ??= new StaticBoxReuseRepository(_context);
@@ -56,6 +58,7 @@ namespace Safes.DAL.Abstraction
                     _staticRepository?.Dispose();
                     _staticBoxReuseRepository?.Dispose();
                     _boxRepository?.Dispose();
+                    _thankRepository?.Dispose();
                 }
 
             _disposed = true;

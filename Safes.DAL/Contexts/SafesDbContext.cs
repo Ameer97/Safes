@@ -42,5 +42,6 @@ namespace Safes.DAL.Contexts
         public DbSet<PlaceEvent> Events { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Permission> Permissions { get; set; }
+        public DbSet<Thank> Thanks { get; set; }
     }
 }

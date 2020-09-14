@@ -11,5 +11,6 @@ namespace Safes.Infrastructure.Interfaces.Repositories
         IOwnerRepository OwnerRepository { get; }
         IMeditorRepository MeditorRepository { get; }
         IEventRepository EventRepository { get; }
+        IThankRepository ThankRepository { get; }
     }
 }
