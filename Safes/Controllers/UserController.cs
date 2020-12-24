@@ -57,17 +57,30 @@ namespace Safes.WebApi.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ClientResponse<Box>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> CreateBox(BoxCreateDto box)
+        public async Task<IActionResult> CreateBox([FromForm] int number)
         {
-            var serviceResponse = await _boxService.CreateBox(box);
+            var serviceResponse = await _boxService.CreateBoxRange(number);
             if (serviceResponse.Error != null)
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
-            return Ok(new ClientResponse<Box>(serviceResponse.Value));
+            return Ok(new ClientResponse<string>(serviceResponse.Value));
         }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(ClientResponse<int>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
+        public async Task<IActionResult> GetLastBoxId()
+        {
+            var serviceResponse = await _boxService.LastBoxId();
+            if (serviceResponse.Error != null)
+                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
+            return Ok(new ClientResponse<int>(serviceResponse.Value));
+        }
+
+
         [HttpGet]
         [ProducesResponseType(typeof(ClientResponse<List<BoxDetailsDto>>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> BoxDetails(int SearchId, bool IsBoxId = true)
+        public async Task<IActionResult> GetBox(int SearchId, bool IsBoxId = true)
         {
             var serviceResponse = await _boxService.BoxDetails(SearchId, IsBoxId);
             if (serviceResponse.Error != null)
@@ -184,7 +197,7 @@ namespace Safes.WebApi.Controllers
         #endregion
         #region Owner
         [HttpGet]
-        [ProducesResponseType(typeof(ClientResponse<List<Box>>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<List<Owner>>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
         public async Task<IActionResult> GetOwners(int? start, int? end)
         {
@@ -196,7 +209,7 @@ namespace Safes.WebApi.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ClientResponse<Box>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> CreateOwner(PersonCreateDto Owner)
+        public async Task<IActionResult> CreateOwner(OwnerCreateDto Owner)
         {
             var serviceResponse = await _ownerService.CreateOwner(Owner);
             if (serviceResponse.Error != null)

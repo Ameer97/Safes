@@ -25,6 +25,18 @@ namespace Safes.DAL.Repositories
         {
             return await _context.Boxes.Where(b => b.BoxId == BoxId).FirstOrDefaultAsync();
         }
+        public async Task<int> LastBoxId()
+        {
+            return await _context.Boxes.Select(b => b.BoxId).MaxAsync();
+        }
+
+        public async Task<List<Box>> SpecialStatusBoxes(List<int> boxes, BoxStatus boxStatus)
+        {
+            return await _context.Boxes
+                .Where(b => b.Status == (int)boxStatus
+                         && boxes.Contains(b.BoxId)).ToListAsync();
+        }
+
         public async Task<BoxDetailsDto> GetBoxDetails(int SearchId, bool IsBoxId = true)
         {
             return (IsBoxId)
@@ -35,12 +47,13 @@ namespace Safes.DAL.Repositories
                 .Select(b => new BoxDetailsDto
                 {
                     BoxId = b.BoxId,
-                    MeditorName = b.Meditor.FirstName + " " + b.Meditor.SecondName + b.Meditor.LastName,
+                    MeditorName = b.Meditor.FirstName + " " + b.Meditor.SecondName + " " + b.Meditor.LastName,
                     OwnerId = b.OwnerId,
-                    OwnerName = b.Owner.FirstName + " " + b.Owner.SecondName + b.Owner.LastName,
+                    OwnerName = b.Owner.Name,
                     EventName = b.Event.Name,
                     Note = b.Note,
-                    DateDeliverd = b.DateDeliverd,
+                    DateDeliverdToMeditor = b.DateDeliverdToMeditor.Value.Date.ToString("dd/MM/yyyy"),
+                    DateDeliverdToOwner = b.DateDeliverdToOwner.Value.Date.ToString("dd/MM/yyyy"),
                     IsReceived = (b.DateReceived != null) ? true : false,
                     DateReceived = b.DateReceived,
                     Amount = b.Amount
@@ -55,10 +68,11 @@ namespace Safes.DAL.Repositories
                     BoxId = b.BoxId,
                     MeditorName = b.Meditor.FirstName + " " + b.Meditor.SecondName + b.Meditor.LastName,
                     OwnerId = b.OwnerId,
-                    OwnerName = b.Owner.FirstName + " " + b.Owner.SecondName + b.Owner.LastName,
+                    OwnerName = b.Owner.Name,
                     EventName = b.Event.Name,
                     Note = b.Note,
-                    DateDeliverd = b.DateDeliverd,
+                    DateDeliverdToMeditor = b.DateDeliverdToMeditor.Value.Date.ToString("dd/MM/yyyy"),
+                    DateDeliverdToOwner = b.DateDeliverdToOwner.Value.Date.ToString("dd/MM/yyyy"),
                     IsReceived = (b.DateReceived != null) ? true : false,
                     DateReceived = b.DateReceived,
                     Amount = b.Amount
@@ -75,15 +89,15 @@ namespace Safes.DAL.Repositories
             var ActiveBoxes = ((Year ?? 0) == 0) 
                 ? await _context.Boxes.Where(b => b.IsDeleted == false).ToListAsync()
                 : (JustThisYear ?? false) 
-                    ? await _context.Boxes.Where(b => b.IsDeleted == false && b.DateDeliverd.Year == Year).ToListAsync()
+                    ? await _context.Boxes.Where(b => b.IsDeleted == false && b.DateDeliverdToMeditor.Value.Year == Year).ToListAsync()
                     : (FromStartUntilYear ?? false)
-                        ? await _context.Boxes.Where(b => b.IsDeleted == false && b.DateDeliverd.Year <= Year).ToListAsync()
-                        : await _context.Boxes.Where(b => b.IsDeleted == false && b.DateDeliverd.Year >= Year).ToListAsync();
+                        ? await _context.Boxes.Where(b => b.IsDeleted == false && b.DateDeliverdToMeditor.Value.Year <= Year).ToListAsync()
+                        : await _context.Boxes.Where(b => b.IsDeleted == false && b.DateDeliverdToMeditor.Value.Year >= Year).ToListAsync();
 
             var Delived = ActiveBoxes.Where(b => b.Amount == null).ToList().Count;
             var Received = ActiveBoxes.Where(b => b.Amount != null).ToList().Count;
-            var Late = ActiveBoxes.Where(b => DateTime.Now.Subtract(b.DateDeliverd).Days >= 365).ToList().Count;
-            var TooLate = ActiveBoxes.Where(b => DateTime.Now.Subtract(b.DateDeliverd).Days >= 730).ToList().Count;
+            var Late = ActiveBoxes.Where(b => DateTime.Now.Subtract(b.DateDeliverdToMeditor.Value).Days >= 365).ToList().Count;
+            var TooLate = ActiveBoxes.Where(b => DateTime.Now.Subtract(b.DateDeliverdToMeditor.Value).Days >= 730).ToList().Count;
 
             var BoxesCount = new BoxCountDto
             {

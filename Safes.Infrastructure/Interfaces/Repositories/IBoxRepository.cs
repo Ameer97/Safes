@@ -1,4 +1,5 @@
-﻿using Safes.Models.Db;
+﻿using Safes.Infrastructure.Enums;
+using Safes.Models.Db;
 using Safes.Models.Dto;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ namespace Safes.Infrastructure.Interfaces.Repositories
         Task<BoxDetailsDto> GetBoxDetails(int SearchId, bool IsBoxId = true);
         Task<Box> FindBoxId(int BoxId);
         Task<BoxCountDto> BoxCount(int? Year = 0, bool? JustThisYear = false, bool? FromStartUntilYear = false);
+        Task<int> LastBoxId();
+        Task<List<Box>> SpecialStatusBoxes(List<int> boxes, BoxStatus boxStatus);
 
     }
 }

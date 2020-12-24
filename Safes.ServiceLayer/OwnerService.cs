@@ -45,7 +45,7 @@ namespace Safes.ServiceLayer
                     Error = new ResponseError("No Owners Found")
                 };
         }
-        public async Task<ServiceResponse<Owner>> CreateOwner(PersonCreateDto form)
+        public async Task<ServiceResponse<Owner>> CreateOwner(OwnerCreateDto form)
         {
             var Owner = _mapper.Map<Owner>(form);
             _repositoryWrapper.OwnerRepository.Insert(Owner);

@@ -3,9 +3,10 @@
     public enum BoxStatus
     {
         Created = 0,
-        Deliverd = 1,
-        Received = 2,
-        Late = 3,
-        TooLate = 4
+        DeliverdToMeditor = 1,
+        DeliverdToOwner = 2,
+        Received = 3,
+        Late = 4,
+        TooLate = 5
     }
 }

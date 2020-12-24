@@ -41,7 +41,7 @@ namespace Safes.DAL.Repositories
                     Note = r.Note,
                     Address = r.Address,
                     OwnerId = r.OwnerId,
-                    OwnerName = r.Owner.FirstName + " " + r.Owner.SecondName + r.Owner.LastName,
+                    OwnerName = r.Owner.Name,
                     MeditorId = r.MeditorId,
                     MeditorName = r.Meditor.FirstName + " " + r.Meditor.SecondName + r.Meditor.LastName
                 }).ToList()

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Enjaz.Isp.Infrastructure.Helpers;
+using Safes.Infrastructure.Enums;
 using Safes.Infrastructure.Interfaces.Repositories;
 using Safes.Infrastructure.Interfaces.Services;
 using Safes.Models.Db;
@@ -45,12 +46,62 @@ namespace Safes.ServiceLayer
                     Error = new ResponseError("No Boxes Found")
                 };
         }
-        public async Task<ServiceResponse<Box>> CreateBox(BoxCreateDto form)
+
+        public async Task<ServiceResponse<string>> AssignBoxToMeditor(BoxToPersonDto form)
         {
-            var Box = _mapper.Map<Box>(form);
-            Box.DateCreated = DateTime.Now;
-            _repositoryWrapper.BoxRepository.Insert(Box);
-            return new ServiceResponse<Box>(Box);
+            var meditor = await _repositoryWrapper.MeditorRepository.FindItemByCondition(m => m.Id == form.PersonId);
+            var boxes = await _repositoryWrapper.BoxRepository.SpecialStatusBoxes(form.BoxIds, BoxStatus.Created);
+
+            if (boxes.Count != form.BoxIds.Count)
+                return new ServiceResponse<string>(default)
+                {
+                    Error = new ResponseError("Invalid boxes")
+                };
+            foreach (var box in boxes)
+            {
+                box.MeditorId = meditor.Id;
+                box.Status = (int)BoxStatus.DeliverdToMeditor;
+                box.DateDeliverdToMeditor = new DateTime();
+                box.DateUpdated = new DateTime();
+            }
+
+            return new ServiceResponse<string>("successfully Assigned");
+        }
+
+        public async Task<ServiceResponse<string>> AssignBoxToOwner(BoxToPersonDto form)
+        {
+            var owner = await _repositoryWrapper.OwnerRepository.FindItemByCondition(m => m.Id == form.PersonId);
+            var boxes = await _repositoryWrapper.BoxRepository.SpecialStatusBoxes(form.BoxIds, BoxStatus.DeliverdToMeditor);
+
+            if (boxes.Count != form.BoxIds.Count)
+                return new ServiceResponse<string>(default)
+                {
+                    Error = new ResponseError("Invalid boxes")
+                };
+            foreach (var box in boxes)
+            {
+                box.OwnerId = owner.Id;
+                box.Status = (int)BoxStatus.DeliverdToMeditor;
+                box.DateDeliverdToOwner = new DateTime();
+                box.DateUpdated = new DateTime();
+            }
+
+            return new ServiceResponse<string>("successfully Assigned");
+        }
+
+        public async Task<ServiceResponse<int>> LastBoxId()
+        {
+            return new ServiceResponse<int>(await _repositoryWrapper.BoxRepository.LastBoxId());
+        }
+
+        public async Task<ServiceResponse<string>> CreateBoxRange(int number)
+        {
+            var lastBoxId = await _repositoryWrapper.BoxRepository.LastBoxId();
+            var boxes = new List<Box>();
+            for (int i = 1; i <= number; i++)
+                boxes.Add(new Box { BoxId = lastBoxId + i });
+            _repositoryWrapper.BoxRepository.InsertRange(boxes);
+            return new ServiceResponse<string>("successfully adding " + number + " box(es)");
         }
         public async Task<ServiceResponse<BoxDetailsDto>> BoxDetails(int SearchId, bool IsBoxId = true)
         {
@@ -59,7 +110,7 @@ namespace Safes.ServiceLayer
                 {
                     Error = new ResponseError("Invalid SearchId")
                 };
-            var BoxDetails = _repositoryWrapper.BoxRepository.GetBoxDetails(SearchId, IsBoxId).Result;
+            var BoxDetails = await _repositoryWrapper.BoxRepository.GetBoxDetails(SearchId, IsBoxId);
             return (BoxDetails != null)
                 ? new ServiceResponse<BoxDetailsDto>(BoxDetails)
                 : new ServiceResponse<BoxDetailsDto>(default)
@@ -129,7 +180,7 @@ namespace Safes.ServiceLayer
                         BoxId = BoxId,
                         MeditorId = Boxes.MeditorId,
                         DateCreated = DateTime.Now,
-                        DateDeliverd = DateTime.Now,
+                        DateDeliverdToMeditor = DateTime.Now,
                         EventId = Boxes.EventId
                     }
                 );

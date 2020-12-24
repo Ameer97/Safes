@@ -9,10 +9,11 @@ namespace Safes.Models.Dto
         public string OwnerName { get; set; }
         public int? OwnerId { get; set; }
         public string EventName { get; set; }
-        public DateTime DateDeliverd { get; set; }
+        public string DateDeliverdToMeditor { get; set; }
+        public string DateDeliverdToOwner { get; set; }
         public bool IsReceived { get; set; }
         public DateTime? DateReceived { get; set; }
-        public int? Amount { get; set; }
+        public uint? Amount { get; set; }
         public string Note { get; set; }
     }
 }

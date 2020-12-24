@@ -11,7 +11,7 @@ namespace Safes.Models.Db
         public int Id { get; set; }
         public int BoxId { get; set; }
 
-        public int MeditorId { get; set; }
+        public int? MeditorId { get; set; }
         [ForeignKey(nameof(MeditorId))]
         public Meditor Meditor { get; set; }
 
@@ -21,17 +21,21 @@ namespace Safes.Models.Db
 
         public int? EventId { get; set; }
         [ForeignKey(nameof(EventId))]
-        public PlaceEvent Event { get; set; }
+        public PlaceEvent Event { get; set; }        
 
-        public DateTime DateDeliverd { get; set; }
-        public DateTime? DateReceived { get; set; }
+        public uint? Amount { get; set; }
 
-        public int? Amount { get; set; }
+        [DefaultValue(0)]
+        public int Status { get; set; }
+
         [DefaultValue("")]
         public string Note { get; set; }
 
         public DateTime DateCreated { get; set; }
         public DateTime? DateUpdated { get; set; }
+        public DateTime? DateDeliverdToMeditor { get; set; }
+        public DateTime? DateDeliverdToOwner { get; set; }
+        public DateTime? DateReceived { get; set; }
 
         [DefaultValue(false)]
         public bool IsDeleted { get; set; }
