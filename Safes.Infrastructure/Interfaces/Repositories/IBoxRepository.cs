@@ -14,7 +14,7 @@ namespace Safes.Infrastructure.Interfaces.Repositories
         Task<Box> FindBoxId(int BoxId);
         Task<BoxCountDto> BoxCount(int? Year = 0, bool? JustThisYear = false, bool? FromStartUntilYear = false);
         Task<int> LastBoxId();
-        Task<List<Box>> SpecialStatusBoxes(List<int> boxes, BoxStatus boxStatus);
+        Task<List<Box>> SpecialStatusBoxes(List<int> boxes, BoxStatusEnum boxStatus);
 
     }
 }

@@ -35,19 +35,21 @@ namespace Safes.ServiceLayer
                     _repositoryWrapper.Dispose();
             _disposed = true;
         }
-        public async Task<ServiceResponse<List<Owner>>> GetOwners(int? start, int? end)
+        public async Task<ServiceResponse<List<OwnerDto>>> GetOwners(int? start, int? end)
         {
             var Owners = _repositoryWrapper.OwnerRepository.FindAllTakeSkip(start, end).ToList();
             return (Owners.Any())
-                ? new ServiceResponse<List<Owner>>(Owners)
-                : new ServiceResponse<List<Owner>>(null)
+                ? new ServiceResponse<List<OwnerDto>>(_mapper.Map<List<OwnerDto>>(Owners))
+                : new ServiceResponse<List<OwnerDto>>(null)
                 {
                     Error = new ResponseError("No Owners Found")
                 };
         }
-        public async Task<ServiceResponse<Owner>> CreateOwner(OwnerCreateDto form)
+        public async Task<ServiceResponse<Owner>> CreateOwner(OwnerDto form)
         {
             var Owner = _mapper.Map<Owner>(form);
+            Owner.DateCreated = DateTime.Now;
+
             _repositoryWrapper.OwnerRepository.Insert(Owner);
             return new ServiceResponse<Owner>(Owner);
         }

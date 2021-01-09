@@ -1,14 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
 using Enjaz.Isp.Infrastructure.Helpers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Safes.DAL.Contexts;
+using Safes.Infrastructure.Enums;
+using Safes.Infrastructure.Interfaces.Repositories;
 using Safes.Infrastructure.Interfaces.Services;
 using Safes.Models.Db;
 using Safes.Models.Dto;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Safes.WebApi.Controllers
 {
@@ -24,6 +27,9 @@ namespace Safes.WebApi.Controllers
         private IStaticService _staticService;
         private IStatisticsService _statisticsService;
         private IThankService _thankService;
+        private SafesDbContext _context;
+        private IMapper _mapper;
+        private readonly ISafesRepositoryWrapper _repositoryWrapper;
 
         public UserController(IBoxService boxService,
                               IUserService userService,
@@ -32,7 +38,10 @@ namespace Safes.WebApi.Controllers
                               IMeditorService meditorService,
                               IThankService thankService,
                               IStatisticsService statisticsService,
-                              IEventService eventService)
+                              IEventService eventService,
+                              SafesDbContext context,
+                              IMapper mapper,
+                              ISafesRepositoryWrapper repositoryWrapper)
         {
             _eventService = eventService;
             _meditorService = meditorService;
@@ -42,6 +51,9 @@ namespace Safes.WebApi.Controllers
             _staticService = staticService;
             _statisticsService = statisticsService;
             _thankService = thankService;
+            _context = context;
+            _repositoryWrapper = repositoryWrapper;
+            _mapper = mapper;
         }
         #region Box
         [HttpGet]
@@ -66,16 +78,19 @@ namespace Safes.WebApi.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ClientResponse<int>), 200)]
-        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
         public async Task<IActionResult> GetLastBoxId()
         {
-            var serviceResponse = await _boxService.LastBoxId();
-            if (serviceResponse.Error != null)
-                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
-            return Ok(new ClientResponse<int>(serviceResponse.Value));
+            var Response = new { lastBoxId = await _GetLastBoxId() };
+            return Ok(Response);
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> GetBoxesOf(int boxStatus)
+        {
+            var Response = new { BoxIds = await _GetBoxesOf(boxStatus) };
+            return Ok(Response);
+        }
 
         [HttpGet]
         [ProducesResponseType(typeof(ClientResponse<List<BoxDetailsDto>>), 200)]
@@ -107,16 +122,7 @@ namespace Safes.WebApi.Controllers
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
             return Ok(new ClientResponse<bool>(serviceResponse.Value));
         }
-        [HttpPost]
-        [ProducesResponseType(typeof(ClientResponse<string>), 200)]
-        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> CreateBoxRange(AssignBoxesToMeditorDto boxes)
-        {
-            var serviceResponse = await _boxService.AssignBoxesoMeditor(boxes);
-            if (serviceResponse.Error != null)
-                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
-            return Ok(new ClientResponse<string>(serviceResponse.Value));
-        }
+
         #endregion
         #region StaticBox
         [HttpGet]
@@ -197,24 +203,30 @@ namespace Safes.WebApi.Controllers
         #endregion
         #region Owner
         [HttpGet]
-        [ProducesResponseType(typeof(ClientResponse<List<Owner>>), 200)]
+        [ProducesResponseType(typeof(ClientResponse<List<OwnerDto>>), 200)]
         [ProducesResponseType(typeof(ClientResponse<string>), 400)]
         public async Task<IActionResult> GetOwners(int? start, int? end)
         {
             var serviceResponse = await _ownerService.GetOwners(start, end);
             if (serviceResponse.Error != null)
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
-            return Ok(new ClientResponse<List<Owner>>(serviceResponse.Value));
+            return Ok(new ClientResponse<List<OwnerDto>>(serviceResponse.Value));
         }
         [HttpPost]
-        [ProducesResponseType(typeof(ClientResponse<Box>), 200)]
-        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> CreateOwner(OwnerCreateDto Owner)
+        public async Task<IActionResult> CreateOwner(OwnerDto form)
         {
-            var serviceResponse = await _ownerService.CreateOwner(Owner);
-            if (serviceResponse.Error != null)
-                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
-            return Ok(new ClientResponse<Owner>(serviceResponse.Value));
+            var Owner = _mapper.Map<Owner>(form);
+            Owner.DateCreated = DateTime.Now;
+
+            var AlreadyOwner = await _context.Owners
+                .Where(o => (o.Phone == form.Phone
+                          || o.Name == form.Name)
+                          && o.IsDeleted == false).FirstOrDefaultAsync();
+            if (AlreadyOwner != null)
+                return Ok(new ClientResponse<Owner>(AlreadyOwner, AlreadyExist("Owner"), true));
+
+            _repositoryWrapper.OwnerRepository.Insert(Owner);
+            return Ok(_SuccessfulResponse());
         }
         #endregion
         #region Meditor
@@ -237,6 +249,31 @@ namespace Safes.WebApi.Controllers
             if (serviceResponse.Error != null)
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
             return Ok(new ClientResponse<Meditor>(serviceResponse.Value));
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetMeditorDetails(int meditorId)
+        {
+            var meditor = await _context.Meditors.Where(m => m.Id == meditorId).FirstOrDefaultAsync();
+
+            var boxes = await _context.Boxes.Where(b => b.MeditorId == meditor.Id).ToListAsync();
+
+            var count = boxes.Count();
+            var groups = boxes.GroupBy(b => b.Status);
+            var ret = groups.Select(g => new MeditorDetails
+            {
+                Type = ((BoxStatusEnum)g.Key).ToString(),
+                Count = g.Count(),
+                FirstDate = GetMinDate((BoxStatusEnum)g.Key, boxes.Where(b => b.Status == g.Key).ToList()),
+                LastDate = GetMinDate((BoxStatusEnum)g.Key, boxes.Where(b => b.Status == g.Key).ToList(), false),
+                Note = ((BoxStatusEnum)g.Key == BoxStatusEnum.Received)? boxes.Where(b => b.Status == g.Key).Select(b => (decimal)b.Amount).Sum().ToString() : null
+            }).ToList();
+
+            var MeditorDetails = new MeditorDetailsDto
+            {
+                TotalCount = count,
+                DetailsList = ret
+            };
+            return Ok(new ClientResponse<MeditorDetailsDto>(MeditorDetails));
         }
         #endregion
         #region Statistics
@@ -285,16 +322,6 @@ namespace Safes.WebApi.Controllers
             return Ok(new ClientResponse<List<Thank>>(serviceResponse.Value));
         }
 
-        [HttpPost]
-        [ProducesResponseType(typeof(ClientResponse<List<Thank>>), 200)]
-        [ProducesResponseType(typeof(ClientResponse<string>), 400)]
-        public async Task<IActionResult> CreateTest(ThankCreateListDto input)
-        {
-            var serviceResponse = new ServiceResponse<string>(input.Note);
-            if (serviceResponse.Error != null)
-                return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
-            return Ok(new ClientResponse<string>(serviceResponse.Value));
-        }
 
         [HttpGet]
         [ProducesResponseType(typeof(ClientResponse<DateTime?>), 200)]
@@ -305,6 +332,222 @@ namespace Safes.WebApi.Controllers
             if (serviceResponse.Error != null)
                 return BadRequest(new ClientResponse<string>(true, serviceResponse.Error.Message));
             return Ok(new ClientResponse<DateTime?>(serviceResponse.Value));
+        }
+        #endregion
+
+        #region simple Pattren
+        [HttpPost]
+        public async Task<IActionResult> CreateBoxRange(CreateBoxRangeForm form)
+        {
+            var FirstNewBox = await _GetLastBoxId() + 1;
+            var LastNewBox = FirstNewBox + form.NumberOfBoxes - 1;
+            var BoxesListRange = new List<Box>();
+            for (int BoxId = FirstNewBox; BoxId <= LastNewBox; BoxId++)
+                BoxesListRange.Add(new Box
+                {
+                    BoxId = BoxId,
+                    DateCreated = DateTime.Now,
+                    Status = (int)BoxStatusEnum.Created
+                });
+
+            _repositoryWrapper.BoxRepository.InsertRange(BoxesListRange);
+
+            var Response = form.NumberOfBoxes + " box(es) had been created from " + FirstNewBox + " to " + LastNewBox;
+            //var service = new ServiceResponse<int>(form.NumberOfBoxes, Response);
+            return Ok(new ClientResponse<int>(form.NumberOfBoxes, Response));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetFromTo(int boxStatus)
+        {
+            var boxIds = await _context.Boxes.Where(b => b.Status == boxStatus).Select(b => b.BoxId).ToListAsync();
+
+            if (boxIds.Count == 0)
+                return Ok(_ErrorInvalidData(_empty));
+
+            var Response = new FirstLastDto
+            {
+                From = boxIds.Min(),
+                To = boxIds.Max()
+            };
+            return Ok(new ClientResponse<FirstLastDto>(Response));
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> AssignBoxesToMeditor(AssignBoxesToPersonDto form)
+        {
+            var CreatedBoxes = await _context.Boxes
+                .Where(b => b.BoxId >= form.From
+                && b.BoxId <= form.To
+                && b.Status == (int)BoxStatusEnum.Created).ToListAsync();
+
+            var meditor = await _repositoryWrapper.MeditorRepository.FindItemByCondition(m => m.Id == form.MeditorId);
+
+            var RequiredCount = form.To - form.From + 1;
+            if (CreatedBoxes.Count() < RequiredCount)
+                return BadRequest(_ErrorInvalidData("some of boxes in this range can't Delivered to Meditor"));
+
+            if (meditor == null)
+                return BadRequest(_ErrorInvalidData("Meditor Not Exist"));
+
+            foreach (var box in CreatedBoxes)
+            {
+                box.MeditorId = meditor.Id;
+                box.Status = (int)BoxStatusEnum.DeliverdToMeditor;
+                box.DateDeliverdToMeditor = form.Date;
+                box.DateUpdated = DateTime.Now;
+            }
+
+            await _context.SaveChangesAsync();
+            var Response = form.From + " To " + form.To + " box(es) had been Assigned to " + _MeditorName(meditor);
+            return Ok(_SuccessfulResponse(Response));
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> AssignSelectedBoxesToMeditor(AssignSelectedBoxesToMeditorDto form)
+        {
+            var CreatedBoxes = await _context.Boxes
+                .Where(b => b.Status == (int)BoxStatusEnum.Created)
+                .Where(b => form.SelectedBoxes.Contains(b.BoxId)).ToListAsync();
+
+            var meditor = await _repositoryWrapper.MeditorRepository.FindItemByCondition(m => m.Id == form.MeditorId);
+
+            var RequiredCount = form.SelectedBoxes.Count();
+            if (CreatedBoxes.Count() < RequiredCount)
+                return BadRequest(_ErrorInvalidData("some of boxes in this range can't Delivered to Meditor"));
+
+            if (meditor == null)
+                return BadRequest(_ErrorInvalidData("Meditor Not Exist"));
+
+            foreach (var box in CreatedBoxes)
+            {
+                box.MeditorId = meditor.Id;
+                box.Status = (int)BoxStatusEnum.DeliverdToMeditor;
+                box.DateDeliverdToMeditor = form.Date;
+                box.DateUpdated = DateTime.Now;
+            }
+
+            await _context.SaveChangesAsync();
+            var Response = RequiredCount + " box(es) had been Assigned to " + _MeditorName(meditor);
+            return Ok(new ClientResponse<List<int>>(await _GetBoxesOf((int)BoxStatusEnum.Created), Response));
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> AssignSelectedBoxesToOwner(AssignSelectedBoxesToOwnerDto form)
+        {
+            var DeliveredToMeditorBoxes = await _context.Boxes
+                .Where(b => b.Status == (int)BoxStatusEnum.DeliverdToMeditor)
+                .Where(b => form.SelectedBoxes.Contains(b.BoxId)).ToListAsync();
+
+            var owner = await _repositoryWrapper.OwnerRepository.FindItemByCondition(m => m.Id == form.OwnerId);
+
+            var RequiredCount = form.SelectedBoxes.Count();
+            if (DeliveredToMeditorBoxes.Count() < RequiredCount)
+                return Ok(_ErrorInvalidData("some of boxes can't Delivered to Owner"));
+
+            if (owner == null)
+                return BadRequest(_ErrorInvalidData("Owner Not Exist"));
+
+            foreach (var box in DeliveredToMeditorBoxes)
+            {
+                box.OwnerId = owner.Id;
+                box.Status = (int)BoxStatusEnum.DeliverdToOwner;
+                box.DateDeliverdToOwner = form.Date;
+                box.DateUpdated = DateTime.Now;
+            }
+
+            await _context.SaveChangesAsync();
+            var Response = RequiredCount + " box(es) had been Assigned to " + owner.Name;
+            return Ok(new ClientResponse<List<int>>(await _GetBoxesOf((int)BoxStatusEnum.DeliverdToMeditor), Response));
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ReceiveBox(ReceiveBoxDto form)
+        {
+            var DeliveredToOwnerBox = await _context.Boxes
+                .Where(b => b.BoxId == form.BoxId)
+                .Where(b => b.Status == (int)BoxStatusEnum.DeliverdToOwner)
+                .FirstOrDefaultAsync();
+
+            if (DeliveredToOwnerBox == null)
+                return Ok(_ErrorInvalidData("Can't Recive this Box, not exist, or not in this state"));
+
+            DeliveredToOwnerBox.Note = form.Note;
+            DeliveredToOwnerBox.Amount = form.Amount;
+            DeliveredToOwnerBox.DateReceived = form.Date;
+            DeliveredToOwnerBox.DateUpdated = DateTime.Now;
+            DeliveredToOwnerBox.Status = (int)BoxStatusEnum.Received;
+
+            await _context.SaveChangesAsync();
+            var Response = "Box " + form.BoxId + " Recived with Amount: " + form.Amount + "IQD";
+            return Ok(new ClientResponse<List<int>>(await _GetBoxesOf((int)BoxStatusEnum.DeliverdToOwner), Response));
+        }
+
+        #endregion
+
+
+        #region functions
+        private async Task<int> _GetLastBoxId()
+        {
+            var boxList = await _context.Boxes.Select(b => b.BoxId).ToListAsync();
+            return (boxList.Count() <= 0) ? 0 : boxList.Max();
+        }
+        private DateTime GetMinDate(BoxStatusEnum boxStatus, List<Box> boxes, bool min = true)
+        {
+            var theBoxes = boxes.Where(b => b.Status == (int)boxStatus);
+            if (min)
+                switch (boxStatus)
+                {
+                    case BoxStatusEnum.Created: return theBoxes.Select(b => b.DateCreated).Min();
+                    case BoxStatusEnum.DeliverdToMeditor: return theBoxes.Select(b => (DateTime)b.DateDeliverdToMeditor).Min();
+                    case BoxStatusEnum.DeliverdToOwner: return theBoxes.Select(b => (DateTime)b.DateDeliverdToOwner).Min();
+                    case BoxStatusEnum.Received: return theBoxes.Select(b => (DateTime)b.DateReceived).Min();
+                }
+            else
+                switch (boxStatus)
+                {
+                    case BoxStatusEnum.Created: return theBoxes.Select(b => b.DateCreated).Max();
+                    case BoxStatusEnum.DeliverdToMeditor: return theBoxes.Select(b => (DateTime)b.DateDeliverdToMeditor).Max();
+                    case BoxStatusEnum.DeliverdToOwner: return theBoxes.Select(b => (DateTime)b.DateDeliverdToOwner).Max();
+                    case BoxStatusEnum.Received: return theBoxes.Select(b => (DateTime)b.DateReceived).Max();
+                }
+            return DateTime.Now;
+        }
+        private async Task<List<int>> _GetBoxesOf(int boxStatus)
+        {
+            return await _context.Boxes
+                .Where(b => b.Status == boxStatus)
+                .Select(b => b.BoxId)
+                .OrderBy(b => b).ToListAsync();
+        }
+
+        private string _MeditorName(Meditor meditor)
+        {
+            return meditor.FirstName + " " + meditor.SecondName + " " + meditor.LastName;
+        }
+
+        #endregion
+
+        #region ResponsesMessage
+
+        private ClientResponse<string> _ErrorInvalidData(string response = "Invalid Data")
+        {
+            return new ClientResponse<string>(null, response, true);
+        }
+
+        private ClientResponse<string> _SuccessfulResponse(string response = "Done")
+        {
+            return new ClientResponse<string>(null, response);
+        }
+
+        private string _empty = "Empty list";
+        private string AlreadyExist(string something = "")
+        {
+            return something + " Already Exist";
         }
         #endregion
     }

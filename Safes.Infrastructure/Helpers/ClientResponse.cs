@@ -21,6 +21,13 @@
             Data = data;
         }
 
+        public ClientResponse(T data, string msg = null, bool err = false)
+        {
+            Error = err;
+            Message = msg;
+            Data = data;
+        }
+
         public bool Error { get; set; }
         public string Message { get; set; }
         public T Data { get; set; }

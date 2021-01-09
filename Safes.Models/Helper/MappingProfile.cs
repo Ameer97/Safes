@@ -21,6 +21,10 @@ namespace Safes.Models.Helper
             CreateMap<PersonCreateDto, Meditor>();
             //CreateMap<Meditor, PersonCreateDto>();
 
+            CreateMap<OwnerDto, Owner>();
+            CreateMap<Owner, OwnerDto>();
+            //CreateMap<Meditor, PersonCreateDto>();
+
             CreateMap<StaticBoxCreateDto, StaticBoxReuse>();
             CreateMap<ReceivedReuseStaticDto, StaticBoxReuse>();
 

@@ -30,7 +30,7 @@ namespace Safes.DAL.Repositories
             return await _context.Boxes.Select(b => b.BoxId).MaxAsync();
         }
 
-        public async Task<List<Box>> SpecialStatusBoxes(List<int> boxes, BoxStatus boxStatus)
+        public async Task<List<Box>> SpecialStatusBoxes(List<int> boxes, BoxStatusEnum boxStatus)
         {
             return await _context.Boxes
                 .Where(b => b.Status == (int)boxStatus
@@ -48,14 +48,14 @@ namespace Safes.DAL.Repositories
                 {
                     BoxId = b.BoxId,
                     MeditorName = b.Meditor.FirstName + " " + b.Meditor.SecondName + " " + b.Meditor.LastName,
-                    OwnerId = b.OwnerId,
+                    BoxStatus = b.Status,
                     OwnerName = b.Owner.Name,
                     EventName = b.Event.Name,
                     Note = b.Note,
-                    DateDeliverdToMeditor = b.DateDeliverdToMeditor.Value.Date.ToString("dd/MM/yyyy"),
-                    DateDeliverdToOwner = b.DateDeliverdToOwner.Value.Date.ToString("dd/MM/yyyy"),
-                    IsReceived = (b.DateReceived != null) ? true : false,
-                    DateReceived = b.DateReceived,
+                    DateDeliverdToMeditor = b.DateDeliverdToMeditor.Value.Date,
+                    DateDeliverdToOwner = b.DateDeliverdToOwner.Value.Date,
+                    DateCreated = b.DateCreated,
+                    DateReceived = b.DateReceived.Value.Date,
                     Amount = b.Amount
                 })
                 .FirstOrDefaultAsync()
@@ -67,14 +67,14 @@ namespace Safes.DAL.Repositories
                 {
                     BoxId = b.BoxId,
                     MeditorName = b.Meditor.FirstName + " " + b.Meditor.SecondName + b.Meditor.LastName,
-                    OwnerId = b.OwnerId,
+                    BoxStatus = b.Status,
                     OwnerName = b.Owner.Name,
                     EventName = b.Event.Name,
                     Note = b.Note,
-                    DateDeliverdToMeditor = b.DateDeliverdToMeditor.Value.Date.ToString("dd/MM/yyyy"),
-                    DateDeliverdToOwner = b.DateDeliverdToOwner.Value.Date.ToString("dd/MM/yyyy"),
-                    IsReceived = (b.DateReceived != null) ? true : false,
-                    DateReceived = b.DateReceived,
+                    DateDeliverdToMeditor = b.DateDeliverdToMeditor.Value.Date,
+                    DateDeliverdToOwner = b.DateDeliverdToOwner.Value.Date,
+                    DateCreated = b.DateCreated,
+                    DateReceived = b.DateReceived.Value.Date,
                     Amount = b.Amount
                 })
                 .FirstOrDefaultAsync();

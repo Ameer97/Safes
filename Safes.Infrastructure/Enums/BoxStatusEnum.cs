@@ -1,6 +1,6 @@
 ﻿namespace Safes.Infrastructure.Enums
 {
-    public enum BoxStatus
+    public enum BoxStatusEnum
     {
         Created = 0,
         DeliverdToMeditor = 1,

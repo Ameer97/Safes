@@ -14,7 +14,7 @@ namespace Safes.Infrastructure.Interfaces.Services
         Task<ServiceResponse<BoxDetailsDto>> BoxDetails(int SearchId, bool IsBoxId = true);
         Task<ServiceResponse<Box>> UpdateReceivedBox(BoxUpdateReceivedDto form);
         Task<ServiceResponse<bool>> IsReceived(int BoxId);
-        Task<ServiceResponse<string>> AssignBoxesoMeditor(AssignBoxesToMeditorDto Boxes);
+        Task<ServiceResponse<string>> AssignBoxesMeditor(AssignBoxesToPersonDto Boxes);
         Task<ServiceResponse<string>> CreateBoxRange(int number);
         Task<ServiceResponse<string>> AssignBoxToMeditor(BoxToPersonDto form);
         Task<ServiceResponse<string>> AssignBoxToOwner(BoxToPersonDto form);

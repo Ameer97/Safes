@@ -50,7 +50,7 @@ namespace Safes.ServiceLayer
         public async Task<ServiceResponse<string>> AssignBoxToMeditor(BoxToPersonDto form)
         {
             var meditor = await _repositoryWrapper.MeditorRepository.FindItemByCondition(m => m.Id == form.PersonId);
-            var boxes = await _repositoryWrapper.BoxRepository.SpecialStatusBoxes(form.BoxIds, BoxStatus.Created);
+            var boxes = await _repositoryWrapper.BoxRepository.SpecialStatusBoxes(form.BoxIds, BoxStatusEnum.Created);
 
             if (boxes.Count != form.BoxIds.Count)
                 return new ServiceResponse<string>(default)
@@ -60,7 +60,7 @@ namespace Safes.ServiceLayer
             foreach (var box in boxes)
             {
                 box.MeditorId = meditor.Id;
-                box.Status = (int)BoxStatus.DeliverdToMeditor;
+                box.Status = (int)BoxStatusEnum.DeliverdToMeditor;
                 box.DateDeliverdToMeditor = new DateTime();
                 box.DateUpdated = new DateTime();
             }
@@ -68,10 +68,32 @@ namespace Safes.ServiceLayer
             return new ServiceResponse<string>("successfully Assigned");
         }
 
+        //public async Task<ServiceResponse<string>> AssignBoxesToMeditor(AssignBoxesToMeditorDto form)
+        //{
+        //    //var meditor = await _repositoryWrapper.MeditorRepository.FindItemByCondition(m => m.Id == form.PersonId);
+        //    //var boxes = await _repositoryWrapper.BoxRepository.SpecialStatusBoxes(form.BoxIds, BoxStatusEnum.Created);
+
+        //    //if (boxes.Count != form.BoxIds.Count)
+        //    //    return new ServiceResponse<string>(default)
+        //    //    {
+        //    //        Error = new ResponseError("Invalid boxes")
+        //    //    };
+        //    //foreach (var box in boxes)
+        //    //{
+        //    //    box.MeditorId = meditor.Id;
+        //    //    box.Status = (int)BoxStatusEnum.DeliverdToMeditor;
+        //    //    box.DateDeliverdToMeditor = new DateTime();
+        //    //    box.DateUpdated = new DateTime();
+        //    //}
+
+        //    return new ServiceResponse<string>("successfully Assigned");
+        //}
+
+
         public async Task<ServiceResponse<string>> AssignBoxToOwner(BoxToPersonDto form)
         {
             var owner = await _repositoryWrapper.OwnerRepository.FindItemByCondition(m => m.Id == form.PersonId);
-            var boxes = await _repositoryWrapper.BoxRepository.SpecialStatusBoxes(form.BoxIds, BoxStatus.DeliverdToMeditor);
+            var boxes = await _repositoryWrapper.BoxRepository.SpecialStatusBoxes(form.BoxIds, BoxStatusEnum.DeliverdToMeditor);
 
             if (boxes.Count != form.BoxIds.Count)
                 return new ServiceResponse<string>(default)
@@ -81,7 +103,7 @@ namespace Safes.ServiceLayer
             foreach (var box in boxes)
             {
                 box.OwnerId = owner.Id;
-                box.Status = (int)BoxStatus.DeliverdToMeditor;
+                box.Status = (int)BoxStatusEnum.DeliverdToMeditor;
                 box.DateDeliverdToOwner = new DateTime();
                 box.DateUpdated = new DateTime();
             }
@@ -149,47 +171,29 @@ namespace Safes.ServiceLayer
                 ? new ServiceResponse<bool>(true)
                 : new ServiceResponse<bool>(false);
         }
-        public async Task<ServiceResponse<string>> AssignBoxesoMeditor(AssignBoxesToMeditorDto Boxes)
+        public async Task<ServiceResponse<string>> AssignBoxesoMeditor(int NumberOfBoxes)
         {
-            if (!Boxes.End.HasValue)
-                Boxes.End = Boxes.Begain;
-
-            if (Boxes.End < Boxes.Begain)
-                return new ServiceResponse<string>(default)
-                {
-                    Error = new ResponseError("end must be greater than begain")
-                };
-            var Meditor = _repositoryWrapper.MeditorRepository.FindItemByCondition(m => m.Id == Boxes.MeditorId);
-            if (Meditor.Result == null)
-                return new ServiceResponse<string>(default)
-                {
-                    Error = new ResponseError("No Meditor Found")
-                };
-            var BoxesRangeInDb = _repositoryWrapper.BoxRepository.FindByCondition(b => b.BoxId >= Boxes.Begain && b.BoxId <= Boxes.End).Select(b => b.BoxId).ToList();
-            if (BoxesRangeInDb.Any())
-                return new ServiceResponse<string>(default)
-                {
-                    Error = new ResponseError("You Already have these box(es) in Db : " + string.Join(" | ", BoxesRangeInDb))
-                };
+            var FirstNewBox = await _repositoryWrapper.BoxRepository.LastBoxId() + 1;
+            var LastNewBox = FirstNewBox + NumberOfBoxes;
             var BoxesListRange = new List<Box>();
-            for (int BoxId = Boxes.Begain; BoxId <= Boxes.End; BoxId++)
+            for (int BoxId = FirstNewBox; BoxId <= LastNewBox; BoxId++)
             {
                 BoxesListRange.Add(
                     new Box
                     {
                         BoxId = BoxId,
-                        MeditorId = Boxes.MeditorId,
-                        DateCreated = DateTime.Now,
-                        DateDeliverdToMeditor = DateTime.Now,
-                        EventId = Boxes.EventId
                     }
                 );
 
             }
             _repositoryWrapper.BoxRepository.InsertRange(BoxesListRange);
-            return new ServiceResponse<string>((Boxes.End - Boxes.Begain + 1) + " box(es) had been added to meditor "
-                + Meditor.Result.FirstName + " from " + Boxes.Begain + " until " + Boxes.End);
+            return new ServiceResponse<string>(NumberOfBoxes + " box(es) had been created from "
+                + FirstNewBox + " to " + LastNewBox);
         }
 
+        public Task<ServiceResponse<string>> AssignBoxesMeditor(AssignBoxesToPersonDto Boxes)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
